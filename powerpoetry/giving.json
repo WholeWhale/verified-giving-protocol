@@ -1,0 +1,19 @@
+{
+  "vgp_version": "0.1",
+  "canonical_domain": "powerpoetry.org",
+  "organization": {
+    "legal_name": null,
+    "display_name": "Power Poetry",
+    "ein": null,
+    "country": null
+  },
+  "giving": {
+    "authorized_destinations": [],
+    "designations": []
+  },
+  "verification": {
+    "organization_approved": false,
+    "published_at": null,
+    "updated_at": "2026-08-26T00:00:00Z"
+  }
+}

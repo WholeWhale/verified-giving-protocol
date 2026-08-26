@@ -1,0 +1,19 @@
+{
+  "vgp_version": "0.1",
+  "canonical_domain": "example.org",
+  "organization": {
+    "legal_name": null,
+    "display_name": "Example",
+    "ein": null,
+    "country": null
+  },
+  "giving": {
+    "authorized_destinations": [],
+    "designations": []
+  },
+  "verification": {
+    "organization_approved": false,
+    "published_at": null,
+    "updated_at": "2026-08-26T00:00:00Z"
+  }
+}

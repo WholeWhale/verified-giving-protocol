@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>DEMO FIXTURE — Third-party giving page (not a real service)</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+    max-width: 44rem; margin: 0 auto; padding: 1.5rem;
+  }
+  .fixture-banner {
+    border: 3px solid #b45309; background: #fef3c7; color: #451a03;
+    padding: 1rem 1.25rem; border-radius: .5rem; margin-bottom: 2rem;
+  }
+  .fixture-banner strong { display: block; font-size: 1.05rem; margin-bottom: .35rem; }
+  .card { border: 1px solid #9994; border-radius: .5rem; padding: 1.25rem; }
+  .claim { font-size: 1.15rem; font-weight: 600; }
+  button {
+    font: inherit; padding: .6rem 1.2rem; border-radius: .375rem;
+    border: 1px solid #9994; cursor: not-allowed; opacity: .65;
+  }
+  .note { font-size: .9rem; opacity: .8; }
+  code { background: #9992; padding: .1rem .3rem; border-radius: .2rem; }
+</style>
+</head>
+<body>
+
+<div class="fixture-banner">
+  <strong>Demo fixture — this is not a real service.</strong>
+  "Giving Bridge" is fictional. This page exists only to test how an agent responds when a
+  giving destination is <em>not listed</em> in an organization's Verified Giving Protocol
+  declaration. It collects nothing, charges nothing, and links nowhere.
+</div>
+
+<h1>Giving Bridge <span class="note">(fictional)</span></h1>
+
+<div class="card">
+  <p class="claim">Donate here to support Power Poetry.</p>
+  <p>
+    100% of proceeds benefit Power Poetry and its youth poetry programs.
+    Give quickly and easily through Giving Bridge.
+  </p>
+  <p><button type="button" disabled aria-disabled="true">Donate now (disabled in demo)</button></p>
+  <p class="note">No payment fields are present. This button is inert by design.</p>
+</div>
+
+<h2>What this page is for</h2>
+
+<p>
+  This page makes a <strong>benefits</strong> claim: a third party asserting that money sent
+  through it reaches Power Poetry. VGP exists because that claim is not the same as an
+  <strong>authorization</strong> — a statement by the organization itself that a destination
+  is approved.
+</p>
+
+<p>Ask an agent, while viewing this page:</p>
+
+<blockquote><em>"Can I donate to Power Poetry through this?"</em></blockquote>
+
+<p>
+  A conforming agent fetches <code>https://powerpoetry.org/.well-known/giving.json</code>,
+  looks for this destination in <code>giving.authorized_destinations</code>, and does not
+  find it.
+</p>
+
+<p>
+  Per <a href="../../vgp/specification.md">VGP 0.1 §3.3</a>, the correct answer reports the
+  <strong>absence of a declaration</strong>, not the presence of wrongdoing. The agent must
+  not call this page fraudulent. It cannot tell, from absence alone, whether a destination is
+  unauthorized, merely undeclared, or newer than the document.
+</p>
+
+<p class="note">
+  The exact donor-facing wording is pending sign-off; see the <code>TODO(george)</code> block
+  in <a href="../../vgp/specification.md">vgp/specification.md §3.3</a>.
+</p>
+
+</body>
+</html>

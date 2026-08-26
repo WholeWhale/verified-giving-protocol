@@ -1,0 +1,42 @@
+{
+  "review_version": "0.1",
+  "canonical_url": "https://example.org/",
+  "retrieved_at": "2026-08-25T00:00:00Z",
+  "organization": {
+    "legal_name": "Example Foundation",
+    "display_name": "Example",
+    "ein": "12-3456789",
+    "country": "US",
+    "nonprofit_status_claim": "Unverified draft claim",
+    "donation_contact": null,
+    "evidence": []
+  },
+  "candidates": [
+    {
+      "id": "direct-card",
+      "type": "credit_card",
+      "provider": "Example Processor",
+      "url": "https://example.org/donate",
+      "recipient": "Example Foundation",
+      "recurring": true,
+      "designation_support": false,
+      "restrictions": null,
+      "status": "confirmed",
+      "evidence": [
+        {
+          "claim": "donation_destination",
+          "value": "https://example.org/donate",
+          "source_url": "https://example.org/donate",
+          "page_title": "Donate",
+          "excerpt": "Donate to Example Foundation.",
+          "retrieved_at": "2026-08-25T00:00:00Z",
+          "confidence": "high"
+        }
+      ]
+    }
+  ],
+  "conflicts": [],
+  "unresolved": [
+    "A nonprofit administrator has not authorized any candidate for publication."
+  ]
+}

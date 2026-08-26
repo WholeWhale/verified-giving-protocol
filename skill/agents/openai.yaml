@@ -1,0 +1,14 @@
+interface:
+  display_name: VGPify
+  short_description: Draft verified nonprofit giving declarations
+  default_prompt: Use $vgpify to analyze a nonprofit website and create an evidence-backed
+    draft VGP implementation.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

@@ -1,0 +1,55 @@
+{
+  "vgp_version": "0.1",
+  "canonical_domain": "example.org",
+  "organization": {
+    "legal_name": "Example Foundation",
+    "display_name": "Example",
+    "ein": "12-3456789",
+    "country": "US"
+  },
+  "giving": {
+    "authorized_destinations": [
+      {
+        "id": "direct-card",
+        "type": "credit_card",
+        "provider": "Example Processor",
+        "url": "https://example.org/donate",
+        "recipient": "Example Foundation",
+        "recurring": true,
+        "designation_support": true,
+        "restrictions": null,
+        "authorization": {
+          "status": "authorized",
+          "approved_by_role": "Executive Director",
+          "approved_at": "2026-08-26T00:00:00Z",
+          "statement": "Our organization authorizes donations through this destination."
+        }
+      },
+      {
+        "id": "mailed-check",
+        "type": "check",
+        "provider": null,
+        "url": null,
+        "recipient": "Example Foundation",
+        "recurring": false,
+        "designation_support": true,
+        "restrictions": "Mail to 1 Example Way, Springfield, IL 62704. Note the designation on the memo line.",
+        "authorization": {
+          "status": "authorized",
+          "approved_by_role": "Executive Director",
+          "approved_at": "2026-08-26T00:00:00Z",
+          "statement": "Our organization authorizes donations through this destination."
+        }
+      }
+    ],
+    "designations": [
+      { "id": "general-fund", "label": "General Fund", "description": "Unrestricted support." },
+      { "id": "youth-programs", "label": "Youth Programs", "description": "Direct program delivery." }
+    ]
+  },
+  "verification": {
+    "organization_approved": true,
+    "published_at": "2026-08-26T00:00:00Z",
+    "updated_at": "2026-08-26T00:00:00Z"
+  }
+}

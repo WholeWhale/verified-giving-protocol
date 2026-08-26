@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://verifiedgiving.org/schema/vgp-review-0.1.schema.json",
+  "title": "VGPify review artifact 0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["review_version", "canonical_url", "retrieved_at", "organization", "candidates", "conflicts", "unresolved"],
+  "properties": {
+    "review_version": { "const": "0.1" },
+    "canonical_url": { "type": "string", "format": "uri" },
+    "retrieved_at": { "type": "string", "format": "date-time" },
+    "organization": { "type": "object" },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "provider", "url", "recipient", "recurring", "designation_support", "restrictions", "status", "evidence"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+          "type": { "enum": ["credit_card", "ach", "check", "daf", "stock", "crypto", "workplace", "other"] },
+          "provider": { "type": ["string", "null"] },
+          "url": { "type": ["string", "null"], "format": "uri" },
+          "recipient": { "type": ["string", "null"] },
+          "recurring": { "type": "boolean" },
+          "designation_support": { "type": "boolean" },
+          "restrictions": { "type": ["string", "null"] },
+          "status": { "enum": ["confirmed", "needs_review", "conflicting", "not_verified"] },
+          "evidence": { "type": "array", "items": { "type": "object" }, "minItems": 1 }
+        },
+        "additionalProperties": true
+      }
+    },
+    "conflicts": { "type": "array", "items": { "type": "object" } },
+    "unresolved": { "type": "array", "items": { "type": "string" } }
+  }
+}
