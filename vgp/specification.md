@@ -60,28 +60,27 @@ VGP establishes authorization. It does not establish universal truth. A destinat
 
 Consumers MUST NOT describe an unlisted destination as fraudulent, fake, a scam, or illegitimate on the basis of its absence alone.
 
-<!--
-TODO(george): the canonical sentence a consumer shows a donor when a destination is not
-listed. This is the line a Challenge judge reads on screen during the trust demo, and the
-line a wrongly-flagged third party could object to. That makes it a comms and legal call,
-not an engineering one.
+### 3.4 The reference response
 
-Constraints the wording has to satisfy:
-  - states only what VGP actually asserts (this domain has not declared this destination)
-  - makes no claim about the third party's conduct or intent
-  - does not imply the absence was investigated or is conclusive
-  - leaves the donor a next step rather than a dead end
+Consumers SHOULD report an unlisted destination in substantially this form, substituting
+the organization's `display_name`:
 
-Draft to approve, edit, or replace:
+> **&lt;Organization&gt; has not listed this destination in its published giving
+> declaration. That is not a finding about this service — it means the organization has
+> not declared it. To give through a pathway &lt;Organization&gt; has authorized, use one
+> of the options it publishes, or contact the organization directly to confirm.**
 
-  "Power Poetry has not listed this destination in its published giving declaration.
-   That is not a finding about this service — it means the organization has not
-   declared it. To give through a pathway Power Poetry has authorized, use one of the
-   options it publishes, or contact the organization directly to confirm."
+Each clause is doing work, and removing any one of them reintroduces a failure mode:
 
-Once settled, this string is the normative example for consumers, and is what
-demo/third-party-example/ should display.
--->
+| Clause | Why it is there |
+|---|---|
+| "has not listed this destination in its published giving declaration" | States only what VGP actually asserts — the scope is this document, not the world. |
+| "That is not a finding about this service" | Blocks the inference a donor would otherwise draw. Absence reads as an accusation unless it is explicitly disclaimed. |
+| "it means the organization has not declared it" | Names the actual cause, and keeps the burden on the declaration rather than on the third party. |
+| "use one of the options it publishes, or contact the organization directly" | Leaves the donor a route. A trust signal that only obstructs giving trains people to ignore it. |
+
+Wording may be adapted to context — length, voice, a spoken interface — provided all four
+functions survive. A consumer MUST NOT drop the disclaimer clause or the next step.
 
 ## 4. Document structure
 

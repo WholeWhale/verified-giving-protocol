@@ -338,12 +338,75 @@ def test_sources_parse() -> None:
         print("  skip  node --check (node not on PATH)")
 
 
+# --------------------------------------------------------------------------
+# 6. The approved not-listed wording must not drift
+# --------------------------------------------------------------------------
+def test_not_listed_wording() -> None:
+    print("\nnot-listed wording (VGP 0.1 section 3.4)")
+    def flatten(path: Path) -> str:
+        # Prose is line-wrapped differently in Markdown and in HTML, so collapse
+        # whitespace before matching sentences across either.
+        return " ".join(path.read_text(encoding="utf-8").split())
+
+    spec = flatten(ROOT / "vgp" / "specification.md")
+    demo = flatten(ROOT / "demo" / "third-party-example" / "index.html")
+
+    # The four clauses the wording is required to carry. Each blocks a distinct
+    # failure mode, so losing any one of them is a substantive regression rather
+    # than a copy edit. See specification.md section 3.4.
+    clauses = {
+        "scope: names the declaration": "has not listed this destination in its published giving",
+        "disclaimer: no finding about the service": "not a finding about this service",
+        "cause: names the declaration, not the party": "the organization has not declared it",
+        "next step: leaves the donor a route": "contact the organization directly to confirm",
+    }
+    for label, fragment in clauses.items():
+        check(f"spec keeps clause -- {label}", fragment in spec, fragment)
+        check(f"demo keeps clause -- {label}", fragment in demo, fragment)
+
+    # Scope this to the reference response itself. Scanning a whole document for
+    # "fraudulent" cannot distinguish asserting the word from forbidding it, and
+    # the specification necessarily forbids it in prose.
+    def reference_response(text: str) -> str | None:
+        start = text.find("has not listed this destination")
+        if start == -1:
+            return None
+        end = text.find("confirm.", start)
+        return text[start : end + len("confirm.")] if end != -1 else None
+
+    for label, text in (("specification", spec), ("demo page", demo)):
+        response = reference_response(text)
+        check(f"{label} contains the reference response", response is not None)
+        if response:
+            offenders = [
+                word
+                for word in ("fraudulent", "scam", "fake", "illegitimate", "phishing")
+                if word in response.lower()
+            ]
+            check(
+                f"{label} reference response accuses no one",
+                not offenders,
+                f"found: {offenders}",
+            )
+
+    # The specification must still forbid the accusation explicitly.
+    check(
+        "specification forbids describing an unlisted destination as fraudulent",
+        "MUST NOT describe an unlisted destination as fraudulent" in spec,
+    )
+    check(
+        "the wording decision is settled, not still a TODO",
+        "TODO(george)" not in spec,
+    )
+
+
 def main() -> int:
     print("VGP 0.1 test suite")
     test_no_artifact_drift()
     test_shipped_documents_validate()
     test_trust_invariants()
     test_approval_gate()
+    test_not_listed_wording()
     test_sources_parse()
 
     print(f"\n{PASSES} passed, {len(FAILURES)} failed")

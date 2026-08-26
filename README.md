@@ -170,7 +170,11 @@ It also asserts no drift between artifacts that exist at two paths: `vgp/schema.
 
 **Authorized giving.** *"I want to donate $100 to Power Poetry. What are my options?"* The agent calls `giving_verify`, `giving_options`, `giving_designations`, presents what the nonprofit actually authorized, and calls `giving_prepare` on the donor's choice. The donor authorizes payment.
 
-**Not listed.** Viewing [`demo/third-party-example/`](demo/third-party-example), a donor asks *"Can I donate to Power Poetry through this?"* The agent checks the declaration, finds no match, and reports that the destination **is not listed as authorized** — not that it is fraudulent. VGP establishes authorization, not universal truth. Absence has several innocent explanations and an agent cannot tell them apart. See [§3.3](vgp/specification.md).
+**Not listed.** Viewing [`demo/third-party-example/`](demo/third-party-example), a donor asks *"Can I donate to Power Poetry through this?"* The agent checks the declaration, finds no match, and answers:
+
+> Power Poetry has not listed this destination in its published giving declaration. That is not a finding about this service — it means the organization has not declared it. To give through a pathway Power Poetry has authorized, use one of the options it publishes, or contact the organization directly to confirm.
+
+Not *"this is fraudulent."* VGP establishes authorization, not universal truth — a destination can be absent because it is unauthorized, because it is new, or because the document is stale, and an agent cannot tell those apart. The wording is normative and each of its four clauses is load-bearing; see [§3.3 and §3.4](vgp/specification.md). Tests assert the clauses stay present in both the specification and the demo.
 
 ## Status and non-goals
 
