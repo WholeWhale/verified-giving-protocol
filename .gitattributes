@@ -1,0 +1,11 @@
+# Normalize to LF in the repository and in the working tree.
+#
+# Two artifacts in this repo are compared byte-for-byte by tests/run_tests.py:
+#   vgp/schema.json          vs  skill/assets/vgp-0.1.schema.json
+#   webmcp/giving-tools.js   vs  a fresh generate_webmcp.py run
+# Letting core.autocrlf decide line endings makes those comparisons depend on
+# the checkout platform. Pin them instead.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.svg text eol=lf
