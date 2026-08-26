@@ -93,7 +93,8 @@ def main() -> int:
     if verification.get("published_at") is None:
         verification["published_at"] = now
 
-    args.vgp.write_text(json.dumps(vgp, indent=2) + "\n", encoding="utf-8")
+    # write_bytes keeps a published declaration byte-identical across platforms.
+    args.vgp.write_bytes((json.dumps(vgp, indent=2) + "\n").encode("utf-8"))
     print(f"Authorized {args.candidate_id} in {args.vgp}")
     return 0
 

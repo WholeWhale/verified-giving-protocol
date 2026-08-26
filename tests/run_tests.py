@@ -74,11 +74,21 @@ def test_no_artifact_drift() -> None:
         check("generate_webmcp.py runs clean", result.returncode == 0, result.stderr)
         if result.returncode == 0:
             shipped = (ROOT / "webmcp" / "giving-tools.js").read_bytes()
+            produced = regenerated.read_bytes()
             check(
                 "webmcp/giving-tools.js matches a fresh generation",
-                shipped == regenerated.read_bytes(),
+                shipped == produced,
                 "regenerate with: python skill/scripts/generate_webmcp.py "
                 "--output webmcp/giving-tools.js",
+            )
+            # Regression guard. Path.write_text opens in text mode, which rewrites
+            # newlines on Windows, so the generator used to emit CRLF there and LF
+            # on Linux. That is invisible on any single platform and breaks the
+            # comparison above only for the half of users on the other one.
+            check(
+                "generator output is byte-deterministic across platforms",
+                b"\r" not in produced,
+                "generated output must be LF-only regardless of host OS",
             )
 
     shipped_text = (ROOT / "webmcp" / "giving-tools.js").read_text(encoding="utf-8")

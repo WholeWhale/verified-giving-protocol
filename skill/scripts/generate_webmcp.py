@@ -19,7 +19,10 @@ def main() -> int:
     template = Path(__file__).resolve().parent.parent / "assets" / "giving-tools.js"
     content = template.read_text(encoding="utf-8").replace("__VGP_URL__", args.vgp_url)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(content, encoding="utf-8")
+    # write_bytes, not write_text: text mode rewrites newlines on Windows, so the
+    # same template would produce different output bytes per platform. A tool that
+    # emits a canonical declaration has to be byte-deterministic everywhere.
+    args.output.write_bytes(content.encode("utf-8"))
     print(f"Generated {args.output}")
     return 0
 
