@@ -58,13 +58,20 @@ def load(path: Path) -> dict:
 def test_no_artifact_drift() -> None:
     print("\nartifact drift")
 
-    canonical = ROOT / "vgp" / "schema.json"
     source = ROOT / "skill" / "assets" / "vgp-0.1.schema.json"
-    check(
-        "vgp/schema.json is byte-identical to the skill copy",
-        canonical.read_bytes() == source.read_bytes(),
-        "the standard must not disagree with its own tooling",
-    )
+    # Every published copy of the schema, checked against the one source. The
+    # site copy is the one strangers resolve via $id, so it is the worst one to
+    # let drift.
+    for label, relative in (
+        ("vgp/schema.json", "vgp/schema.json"),
+        ("site/public/schema/vgp-0.1.schema.json", "site/public/schema/vgp-0.1.schema.json"),
+    ):
+        copy = ROOT / relative
+        check(
+            f"{label} is byte-identical to the skill copy",
+            copy.exists() and copy.read_bytes() == source.read_bytes(),
+            "the standard must not disagree with its own tooling",
+        )
 
     with tempfile.TemporaryDirectory() as raw:
         regenerated = Path(raw) / "giving-tools.js"

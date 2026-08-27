@@ -1,0 +1,461 @@
+/* ============================================================
+   THE STATE DESIGN OFFICE
+   Three permitted inks on recycled board. Nothing else prints.
+
+   The ink set is fixed by the office. A fourth colour is not a
+   design decision available to any page in this system.
+   ============================================================ */
+
+:root {
+  /* --- the board and its stocks --- */
+  --board:        #d9d7cc;  /* recycled board, the ground everything prints on */
+  --stock:        #f0eee6;  /* lighter cell stock, for cells that must hold text */
+  --board-edge:   #c3c0b2;  /* the board's own shadowless edge */
+
+  /* --- the three permitted inks --- */
+  --ink:          #0424aa;  /* INK 1. structural. body text, rules, keylines. this is the black. */
+  --ink-active:   #00c9ff;  /* INK 2. state. the active cell, wayfinding, registration shift. */
+  --ink-mark:     #ffca0a;  /* INK 3. reserved. authorised destinations and nothing else. */
+
+  /* Derived only. No new hues; these are the inks at press dilution. */
+  --ink-60:       color-mix(in srgb, var(--ink) 60%, var(--board));
+  --ink-35:       color-mix(in srgb, var(--ink) 35%, var(--board));
+  --ink-12:       color-mix(in srgb, var(--ink) 12%, var(--board));
+
+  --rule:         1px solid var(--ink);
+  --rule-heavy:   2px solid var(--ink);
+  --rule-hair:    1px solid var(--ink-35);
+
+  /* The grid is small and everything locks to it. */
+  --u:            4px;
+  --gutter:       calc(var(--u) * 5);
+  --measure:      68ch;
+
+  --font-office:  'Archivo', ui-sans-serif, system-ui, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:    'Spline Sans Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  color-scheme: light dark;
+}
+
+/* The night edition. The board goes to press-room dark; the inks do not move.
+   Print is print: the ink set is identical, only the stock changes. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-edition='day']) {
+    --board:      #16181c;
+    --stock:      #1e2126;
+    --board-edge: #2b2f36;
+    --ink:        #7ea2ff;   /* INK 1 at night density, so it still reads on dark board */
+    --ink-active: #00c9ff;
+    --ink-mark:   #ffca0a;
+  }
+}
+:root[data-edition='night'] {
+  --board:      #16181c;
+  --stock:      #1e2126;
+  --board-edge: #2b2f36;
+  --ink:        #7ea2ff;
+  --ink-active: #00c9ff;
+  --ink-mark:   #ffca0a;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  background: var(--board);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--board);
+  color: var(--ink);
+  font-family: var(--font-office);
+  font-size: 16px;
+  line-height: 1.5;
+  font-synthesis-weight: none;
+}
+
+/* ------------------------------------------------------------
+   THE PLATE
+   Every page is a printed plate with a fixed margin. The plate
+   does not float, has no shadow, and never rounds a corner:
+   it is stock, not a card.
+   ------------------------------------------------------------ */
+.plate {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* ------------------------------------------------------------
+   THE OFFICE MARK
+   Geometric, unsigned, identical on every product. It is the
+   grammar's mark, not the publisher's: attribution lives in the
+   colophon at the foot, never here.
+   ------------------------------------------------------------ */
+.mark { display: block; width: 26px; height: 26px; flex: none; }
+.mark rect, .mark path, .mark circle { fill: none; stroke: var(--ink); stroke-width: 2; }
+.mark .fill { fill: var(--ink); stroke: none; }
+
+/* ------------------------------------------------------------
+   MASTHEAD
+   A ruled band, not a navigation bar. Nothing floats or blurs.
+   ------------------------------------------------------------ */
+.masthead {
+  border-bottom: var(--rule-heavy);
+  background: var(--board);
+}
+.masthead__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--gutter);
+  padding: calc(var(--u) * 3) 0;
+  flex-wrap: wrap;
+}
+.masthead__id {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 2);
+  text-decoration: none;
+  color: var(--ink);
+}
+.masthead__title {
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.masthead nav {
+  margin-left: auto;
+  display: flex;
+  gap: calc(var(--u) * 5);
+  flex-wrap: wrap;
+}
+.masthead nav a {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink);
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+}
+.masthead nav a:hover,
+.masthead nav a:focus-visible { border-bottom-color: var(--ink-active); }
+.masthead nav a[aria-current='page'] { border-bottom-color: var(--ink); }
+
+/* ------------------------------------------------------------
+   TYPE
+   One scale, locked. Headings sit on the grid; more space above
+   a heading than below it.
+   ------------------------------------------------------------ */
+h1, h2, h3, h4 { font-weight: 700; letter-spacing: -0.015em; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(2.1rem, 5.5vw, 3.4rem); }
+h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); margin-top: calc(var(--u) * 14); margin-bottom: calc(var(--u) * 4); }
+h3 { font-size: 1.1rem; margin-top: calc(var(--u) * 9); margin-bottom: calc(var(--u) * 2); }
+p  { margin: 0 0 1em; max-width: var(--measure); }
+a  { color: var(--ink); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { text-decoration-color: var(--ink-active); }
+strong { font-weight: 700; }
+code, kbd, samp, pre { font-family: var(--font-mono); }
+
+.lede { font-size: 1.12rem; max-width: 62ch; }
+.mono { font-family: var(--font-mono); }
+
+/* A caption ruled at the foot, as on a numbered plate. */
+.caption {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-60);
+  border-top: var(--rule-hair);
+  padding-top: calc(var(--u) * 2);
+  margin-top: calc(var(--u) * 2);
+}
+
+/* Every unit is numbered. The spec, the generator and the
+   validator cite the same number. */
+.unit-no {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-60);
+  letter-spacing: 0.06em;
+}
+
+/* ------------------------------------------------------------
+   THE KIOSK GRID
+   Goods on a shelf. Reflows in whole cells only, never by
+   squeezing one.
+   ------------------------------------------------------------ */
+.kiosk {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(228px, 1fr));
+  gap: var(--rule-gap, 2px);
+  background: var(--ink-35);
+  border: var(--rule-heavy);
+}
+
+.cell {
+  min-width: 0;
+  background: var(--stock);
+  padding: calc(var(--u) * 4);
+  min-height: 148px;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 2);
+  position: relative;
+}
+.cell__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--u) * 2);
+}
+.cell__label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+}
+.cell__meta { font-family: var(--font-mono); font-size: 12px; color: var(--ink-60); }
+
+/* The active cell takes the second ink, and registration shifts
+   very slightly, the way a second pass lands off-register. */
+.cell--active { background: color-mix(in srgb, var(--ink-active) 22%, var(--stock)); }
+.cell[data-interactive]:hover,
+.cell[data-interactive]:focus-within { transform: translate(-1px, -1px); }
+.cell[data-interactive] { transition: transform 90ms steps(2, end); }
+
+/* THE EMPTY RULE BOX.
+   A destination the organisation has not declared prints as an
+   empty ruled cell. It is a void in the run, not an error: the
+   press had nothing to print there. Specification section 3.4. */
+.cell--unlisted {
+  background: var(--board);
+  border: 2px dashed var(--ink-35);
+  color: var(--ink-60);
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.cell--unlisted .cell__label { font-size: 12px; max-width: 24ch; line-height: 1.4; }
+
+/* ------------------------------------------------------------
+   AUTHORISED
+   Ink 3 appears here and in no other context on the site. If it
+   shows up anywhere else, the system has been broken.
+   ------------------------------------------------------------ */
+.authorised {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--u) * 1.5);
+  background: var(--ink-mark);
+  color: #1b1b19;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 2px calc(var(--u) * 1.5);
+}
+.authorised::before { content: '\25a0'; font-size: 9px; }
+
+.not-authorised {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--u) * 1.5);
+  border: 1px dashed var(--ink-35);
+  color: var(--ink-60);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 1px calc(var(--u) * 1.5);
+}
+
+/* ------------------------------------------------------------
+   THE REGISTER
+   Full-width rows with tabular figures. Density is the point:
+   a departures board, not a card grid.
+   ------------------------------------------------------------ */
+.table-scroll {
+  overflow-x: auto;
+  border-bottom: var(--rule-hair);
+  -webkit-overflow-scrolling: touch;
+}
+.table-scroll .register { min-width: 620px; }
+
+.register { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.register caption {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-60);
+  padding-bottom: calc(var(--u) * 2);
+}
+.register th, .register td {
+  text-align: left;
+  padding: calc(var(--u) * 3) calc(var(--u) * 3) calc(var(--u) * 3) 0;
+  border-bottom: var(--rule-hair);
+  vertical-align: top;
+}
+.register thead th {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-60);
+  border-bottom: var(--rule);
+  white-space: nowrap;
+}
+.register td.num { font-family: var(--font-mono); font-size: 13px; color: var(--ink-60); width: 1%; white-space: nowrap; }
+.register tbody tr:last-child td { border-bottom: var(--rule); }
+
+/* ------------------------------------------------------------
+   THE FILE
+   giving.json is set as printed matter, not a terminal.
+   ------------------------------------------------------------ */
+.file {
+  min-width: 0;
+  background: var(--stock);
+  border: var(--rule-heavy);
+  overflow: hidden;
+}
+.file__head {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 2);
+  padding: calc(var(--u) * 2) calc(var(--u) * 3);
+  border-bottom: var(--rule);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  flex-wrap: wrap;
+}
+.file__path { font-weight: 500; }
+.file__badge {
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-60);
+}
+.file pre {
+  margin: 0;
+  padding: calc(var(--u) * 4);
+  font-size: 13px;
+  line-height: 1.65;
+  overflow-x: auto;
+  tab-size: 2;
+}
+/* Two inks only inside the file: structure and value. */
+.t-key  { color: var(--ink); font-weight: 600; }
+.t-str  { color: color-mix(in srgb, var(--ink-active) 78%, var(--ink)); }
+.t-num,
+.t-bool { color: var(--ink-60); }
+.t-punc { color: var(--ink-35); }
+.t-mark { background: var(--ink-mark); color: #1b1b19; padding: 0 3px; }
+
+/* ------------------------------------------------------------
+   PLATE ACTION
+   The primary action is a printed plate, never a pill.
+   ------------------------------------------------------------ */
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--u) * 2);
+  background: var(--ink);
+  color: var(--board);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: calc(var(--u) * 3) calc(var(--u) * 5);
+  border: 2px solid var(--ink);
+}
+.action:hover, .action:focus-visible {
+  background: var(--ink-active);
+  border-color: var(--ink);
+  color: #0b1020;
+}
+.action--ghost { background: transparent; color: var(--ink); }
+.action--ghost:hover, .action--ghost:focus-visible { background: var(--ink-active); color: #0b1020; }
+
+/* ------------------------------------------------------------
+   SECTIONS
+   ------------------------------------------------------------ */
+.band { padding: calc(var(--u) * 16) 0; border-top: var(--rule-heavy); }
+.band--tight { padding: calc(var(--u) * 10) 0; }
+.band__no {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-60);
+  margin-bottom: calc(var(--u) * 3);
+  display: block;
+}
+
+/* ------------------------------------------------------------
+   COLOPHON
+   Attribution prints here and only here.
+   ------------------------------------------------------------ */
+.colophon {
+  border-top: var(--rule-heavy);
+  padding: calc(var(--u) * 8) 0 calc(var(--u) * 12);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--ink-60);
+}
+.colophon a { color: var(--ink-60); }
+.colophon__row { display: flex; gap: var(--gutter); flex-wrap: wrap; align-items: baseline; }
+
+/* ------------------------------------------------------------
+   ACCESSIBILITY
+   ------------------------------------------------------------ */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--ink-active);
+  outline-offset: 2px;
+}
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.skip {
+  position: absolute; left: -9999px; top: 0; background: var(--ink); color: var(--board);
+  padding: calc(var(--u) * 2) calc(var(--u) * 4); z-index: 10; font-family: var(--font-mono);
+}
+.skip:focus { left: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  .cell[data-interactive]:hover, .cell[data-interactive]:focus-within { transform: none; }
+}
+
+@media (max-width: 640px) {
+  :root { --gutter: calc(var(--u) * 4); }
+  .band { padding: calc(var(--u) * 11) 0; }
+  .register th, .register td { padding-right: calc(var(--u) * 2); }
+}
+
+
+/* ------------------------------------------------------------
+   THE REGISTRATION BLOCK
+   Printers stamp ink, plate and revision in the margin so a run
+   can be checked against its spec. Same job here.
+   ------------------------------------------------------------ */
+.stamp {
+  border: var(--rule-heavy);
+  background: var(--stock);
+  padding: calc(var(--u) * 4);
+  align-self: start;
+}
+.stamp dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: calc(var(--u) * 2) calc(var(--u) * 4); }
+.stamp dt {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-60); white-space: nowrap;
+}
+.stamp dd { margin: 0; font-family: var(--font-mono); font-size: 12.5px; }
+.stamp__inks { display: flex; gap: 3px; margin-top: calc(var(--u) * 4); border-top: var(--rule-hair); padding-top: calc(var(--u) * 3); }
+.stamp__ink { width: 22px; height: 22px; border: 1px solid var(--ink); }
+
+.masthead nav { min-width: 0; }
