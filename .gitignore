@@ -7,3 +7,6 @@ node_modules/
 Thumbs.db
 *.log
 .tmp/
+
+# Impeccable session state and review captures are local, not project artifacts.
+.impeccable/
