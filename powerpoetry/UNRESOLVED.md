@@ -8,15 +8,31 @@ This is deliberate. VGP's entire purpose is to distinguish what an organization 
 actually declared from what can be inferred about it. A reference implementation that
 guessed its own EIN would refute the standard it ships with.
 
-## What must be established
+## Resolved 2026-08-27
+
+Power Poetry is a **program of To Be Heard Foundation**. Donations are earmarked for the
+program and routed through the main 501(c)(3), which is the party that actually receives
+the gift.
+
+That is a fiscal structure, not a conflict. Discovery tooling flags the two names as
+`conflicting` because a scraper sees one name on the site and another on the donation
+page, and VGP forbids inferring that a brand and a legal entity are the same party. The
+organisation stating the relationship is exactly the gap the protocol closes:
+
+| Field | Value | Why |
+|---|---|---|
+| `organization.legal_name` | To Be Heard Foundation | The 501(c)(3) that receives the gift. |
+| `organization.display_name` | Power Poetry | The public name on this domain. |
+| `destination.recipient` | To Be Heard Foundation | What the approved flow actually shows the donor. |
+| `designations[].id` | `power-poetry` | The earmarked program. |
+
+## What is still unresolved
 
 | Field | Status | Why it is blocked |
 |---|---|---|
-| `organization.legal_name` | unresolved | The relationship between **Power Poetry** and **To Be Heard Foundation** is not established. One is the public brand; the other appears as a donation recipient. VGP forbids inferring that a brand and a legal entity are the same party, and forbids inferring fiscal sponsorship or DBA status. |
-| `organization.ein` | unresolved | Follows from `legal_name`. The EIN belongs to whichever entity actually receives the gift. |
-| `organization.country` | unresolved | Left `null` rather than assumed. `US` is likely but has not been recorded from first-party evidence, and an approved US document is required by the validator to carry a valid EIN. |
-| `giving.authorized_destinations` | empty | No administrator has affirmed any destination. Discovery cannot populate this array — only approval can. |
-| `giving.designations` | empty | Navigation labels are not funds. Designations require confirmation that each is currently accepted. |
+| `organization.ein` | **unresolved** | To Be Heard Foundation's EIN has not been recorded from a first-party source. The validator requires one before an approved US document is valid, and `approve_destination.py` refuses to promote any destination without it. This is now the only field blocking publication. |
+| `giving.authorized_destinations` | empty | No administrator has affirmed any destination. Discovery cannot populate this array; only approval can. |
+| Current donation URL and processor | unresolved | The live giving flow and its recipient display have not been confirmed. |
 
 ## How this file becomes publishable
 

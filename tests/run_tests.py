@@ -124,11 +124,30 @@ def test_shipped_documents_validate() -> None:
         powerpoetry["verification"]["organization_approved"] is False,
         "the reference implementation must not claim approval it has not received",
     )
+    # The entity question is resolved: Power Poetry is a program of To Be Heard
+    # Foundation, and gifts are earmarked to the program but received by the
+    # 501(c)(3). That is a fiscal structure, not a conflict, and VGP models it
+    # with display_name, recipient, and a designation rather than by pretending
+    # the two names are one party.
+    org = powerpoetry["organization"]
     check(
-        "powerpoetry/giving.json asserts no legal entity",
-        powerpoetry["organization"]["legal_name"] is None
-        and powerpoetry["organization"]["ein"] is None,
-        "the Power Poetry / To Be Heard Foundation relationship is unresolved",
+        "powerpoetry names the receiving legal entity",
+        org["legal_name"] == "To Be Heard Foundation",
+    )
+    check(
+        "powerpoetry keeps the program as the display name",
+        org["display_name"] == "Power Poetry",
+        "the domain's public name is the program, not the legal entity",
+    )
+    check(
+        "the earmarked program is declared as a designation",
+        any(d["id"] == "power-poetry" for d in powerpoetry["giving"]["designations"]),
+    )
+    # The EIN is the remaining blocker, and the approval gate must still refuse.
+    check(
+        "powerpoetry still has no EIN, so it cannot be approved",
+        org["ein"] is None,
+        "a US organization needs a valid EIN before any destination is authorized",
     )
 
 

@@ -459,3 +459,86 @@ code, kbd, samp, pre { font-family: var(--font-mono); }
 .stamp__ink { width: 22px; height: 22px; border: 1px solid var(--ink); }
 
 .masthead nav { min-width: 0; }
+
+/* ------------------------------------------------------------
+   PROSE
+   The specification, set as a numbered plate rather than a blog
+   post. Rendered from vgp/specification.md at build time: one
+   source, so the site cannot drift from the standard it serves.
+   ------------------------------------------------------------ */
+.prose { max-width: 74ch; }
+.prose h2 {
+  border-top: var(--rule-heavy);
+  padding-top: calc(var(--u) * 5);
+  margin-top: calc(var(--u) * 16);
+}
+.prose h2:first-of-type { margin-top: calc(var(--u) * 8); }
+.prose h3 { margin-top: calc(var(--u) * 10); }
+.prose ol, .prose ul { padding-left: 1.4em; max-width: var(--measure); }
+.prose li { margin-bottom: 0.55em; }
+.prose li::marker { color: var(--ink-60); font-family: var(--font-mono); font-size: 0.85em; }
+.prose blockquote {
+  margin: calc(var(--u) * 6) 0;
+  padding: calc(var(--u) * 4) calc(var(--u) * 5);
+  border: var(--rule-heavy);
+  background: var(--stock);
+  font-size: 1.02rem;
+}
+.prose blockquote p:last-child { margin-bottom: 0; }
+.prose code {
+  background: var(--ink-12);
+  padding: 1px 4px;
+  font-size: 0.9em;
+}
+.prose pre {
+  background: var(--stock);
+  border: var(--rule-heavy);
+  padding: calc(var(--u) * 4);
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.prose pre code { background: none; padding: 0; font-size: inherit; }
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  margin: calc(var(--u) * 5) 0;
+}
+.prose th, .prose td {
+  text-align: left;
+  padding: calc(var(--u) * 2.5) calc(var(--u) * 3) calc(var(--u) * 2.5) 0;
+  border-bottom: var(--rule-hair);
+  vertical-align: top;
+}
+.prose thead th {
+  border-bottom: var(--rule);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-60);
+}
+.prose hr { border: 0; border-top: var(--rule-heavy); margin: calc(var(--u) * 12) 0; }
+
+/* Contents, ruled like a plate index. */
+.contents { border: var(--rule-heavy); background: var(--stock); padding: calc(var(--u) * 5); }
+.contents ol { list-style: none; margin: 0; padding: 0; }
+.contents li { margin: 0; border-bottom: var(--rule-hair); }
+.contents li:last-child { border-bottom: 0; }
+.contents a {
+  display: flex;
+  gap: calc(var(--u) * 3);
+  padding: calc(var(--u) * 2) 0;
+  text-decoration: none;
+  font-size: 14px;
+}
+.contents a:hover { color: var(--ink); text-decoration: underline; }
+.contents .n { font-family: var(--font-mono); font-size: 12px; color: var(--ink-60); min-width: 2.5em; }
+
+.spec-layout { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: calc(var(--u) * 12); align-items: start; }
+.spec-aside { position: sticky; top: calc(var(--u) * 5); }
+@media (max-width: 980px) {
+  .spec-layout { grid-template-columns: minmax(0, 1fr); }
+  .spec-aside { position: static; }
+}

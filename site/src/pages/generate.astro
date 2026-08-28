@@ -1,0 +1,362 @@
+---
+import Office from '../layouts/Office.astro';
+
+const STATEMENT = 'Our organization authorizes donations through this destination.';
+const METHODS = ['credit_card', 'ach', 'check', 'daf', 'stock', 'crypto', 'workplace', 'other'];
+---
+<Office
+  title="Generate a VGP declaration"
+  description="Build a valid giving.json for your organisation. Deterministic and form-driven: it never crawls, never calls a model, and never marks a destination authorised without a verbatim affirmation."
+  current="generate"
+>
+
+<section class="band band--tight" style="border-top:0">
+  <div class="plate">
+    <span class="band__no">Plate 01 &middot; generate</span>
+
+    <div class="masthead-split">
+      <div>
+        <h1 style="max-width:15ch;text-wrap:balance">Build your declaration.</h1>
+        <p class="lede" style="margin-top:1.25rem">
+          Everything you enter stays in this browser. This form does not crawl your site,
+          does not call a model, and does not send your organisation's details anywhere.
+        </p>
+      </div>
+      <aside class="stamp" aria-label="Generator notes">
+        <dl>
+          <dt>Method</dt><dd>deterministic form</dd>
+          <dt>Network</dt><dd>none &mdash; local only</dd>
+          <dt>Discovery</dt><dd>see the VGPify skill</dd>
+          <dt>Output</dt><dd>giving.json</dd>
+        </dl>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="plate">
+    <div class="gen">
+      <form id="gen" class="gen__form" novalidate>
+
+        <!-- 01 ORGANISATION -->
+        <fieldset class="fs">
+          <legend><span class="unit-no">01</span> The organisation</legend>
+          <p class="fs__note">
+            The legal name is the entity that <em>receives</em> the gift. The display name is
+            the public name on this domain. They legitimately differ when a programme is run
+            by a parent charity, and VGP expects you to state both rather than pick one.
+          </p>
+
+          <label>Canonical domain
+            <input name="canonical_domain" placeholder="example.org" autocomplete="off" spellcheck="false" />
+            <small>Host only. No scheme, no path.</small>
+          </label>
+          <label>Legal name
+            <input name="legal_name" placeholder="Example Foundation" autocomplete="off" />
+            <small>The entity that receives the money.</small>
+          </label>
+          <label>Display name
+            <input name="display_name" placeholder="Example" autocomplete="off" />
+            <small>The public name on this domain. May be a programme.</small>
+          </label>
+          <div class="fs__row">
+            <label>EIN
+              <input name="ein" placeholder="12-3456789" autocomplete="off" spellcheck="false" />
+              <small>Required for US organisations.</small>
+            </label>
+            <label>Country
+              <input name="country" placeholder="US" maxlength="2" autocomplete="off" spellcheck="false" />
+              <small>Two letters, uppercase.</small>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- 02 DESIGNATIONS -->
+        <fieldset class="fs">
+          <legend><span class="unit-no">02</span> Designations</legend>
+          <p class="fs__note">
+            Funds or programmes a donor may earmark a gift to. Only list what the
+            organisation currently accepts. Navigation labels from a website are not funds.
+          </p>
+          <div id="designations"></div>
+          <button type="button" class="action action--ghost" data-add="designation">Add designation</button>
+        </fieldset>
+
+        <!-- 03 DESTINATIONS -->
+        <fieldset class="fs">
+          <legend><span class="unit-no">03</span> Candidate destinations</legend>
+          <p class="fs__note">
+            Adding a destination here does <strong>not</strong> authorise it. Candidates sit
+            outside the declaration until they are affirmed in step 04.
+          </p>
+          <div id="destinations"></div>
+          <button type="button" class="action action--ghost" data-add="destination">Add destination</button>
+        </fieldset>
+
+        <!-- 04 AUTHORISATION -->
+        <fieldset class="fs fs--gate">
+          <legend><span class="unit-no">04</span> Authorisation</legend>
+          <p class="fs__note">
+            This is the only step that can put a destination into the declaration, and it
+            cannot be automated. An administrator of the organisation must type the
+            affirmation exactly, for each destination, on the organisation's behalf.
+          </p>
+          <blockquote class="affirmation">{STATEMENT}</blockquote>
+          <div id="gate"><p class="fs__note">Add a destination in step 03 first.</p></div>
+        </fieldset>
+      </form>
+
+      <!-- OUTPUT -->
+      <aside class="gen__out">
+        <div class="file">
+          <div class="file__head">
+            <span class="file__path">/.well-known/giving.json</span>
+            <span class="file__badge" id="state">draft</span>
+          </div>
+          <pre id="out"><code>{'{'}{'}'}</code></pre>
+        </div>
+        <div id="verdict" class="verdict"></div>
+        <div style="display:flex;gap:calc(var(--u)*2);flex-wrap:wrap;margin-top:calc(var(--u)*4)">
+          <button type="button" class="action" id="download">Download giving.json</button>
+          <button type="button" class="action action--ghost" id="copy">Copy</button>
+        </div>
+        <p class="caption">
+          Serve this at <span class="mono">https://&lt;your-domain&gt;/.well-known/giving.json</span>
+          as <span class="mono">application/json</span> over HTTPS.
+        </p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .gen { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: calc(var(--u) * 10); align-items: start; }
+  .gen__out { position: sticky; top: calc(var(--u) * 5); }
+  @media (max-width: 1020px) {
+    .gen { grid-template-columns: minmax(0, 1fr); }
+    .gen__out { position: static; }
+  }
+  .fs { border: 2px solid var(--ink); background: var(--stock); padding: calc(var(--u) * 5); margin: 0 0 calc(var(--u) * 5); }
+  .fs--gate { border-color: var(--ink); background: var(--board); }
+  .fs legend { font-weight: 700; font-size: 1.05rem; padding: 0 calc(var(--u) * 2); display: flex; gap: calc(var(--u) * 2); align-items: baseline; }
+  .fs__note { font-size: 13.5px; color: var(--ink-60); max-width: 60ch; }
+  .fs label { display: block; margin-bottom: calc(var(--u) * 4); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-60); }
+  .fs input, .fs select, .fs textarea {
+    display: block; width: 100%; margin-top: calc(var(--u) * 1.5);
+    font-family: var(--font-mono); font-size: 14px; text-transform: none; letter-spacing: 0;
+    color: var(--ink); background: var(--board); border: 1px solid var(--ink); border-radius: 0;
+    padding: calc(var(--u) * 2) calc(var(--u) * 2.5);
+  }
+  .fs input:focus, .fs select:focus { outline: 3px solid var(--ink-active); outline-offset: 1px; }
+  .fs small { display: block; margin-top: 4px; font-family: var(--font-office); font-size: 11.5px; text-transform: none; letter-spacing: 0; color: var(--ink-60); }
+  .fs__row { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--u) * 4); }
+  .item { border: 1px solid var(--ink); padding: calc(var(--u) * 4); margin-bottom: calc(var(--u) * 4); background: var(--board); }
+  .item__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: calc(var(--u) * 3); }
+  .item__no { font-family: var(--font-mono); font-size: 12px; color: var(--ink-60); }
+  .item__del { background: none; border: 1px solid var(--ink-35); color: var(--ink-60); font-family: var(--font-mono); font-size: 11px; padding: 2px 8px; cursor: pointer; }
+  .item__del:hover { border-color: var(--ink); color: var(--ink); }
+  .checks { display: flex; gap: calc(var(--u) * 5); flex-wrap: wrap; margin-bottom: calc(var(--u) * 3); }
+  .checks label { display: flex; align-items: center; gap: calc(var(--u) * 2); margin: 0; }
+  .checks input { width: auto; margin: 0; }
+  .affirmation {
+    margin: calc(var(--u) * 4) 0; padding: calc(var(--u) * 3) calc(var(--u) * 4);
+    border-left: 4px solid var(--ink-mark); background: var(--stock);
+    font-family: var(--font-mono); font-size: 13.5px;
+  }
+  .gate-item { border: 1px solid var(--ink); background: var(--stock); padding: calc(var(--u) * 4); margin-bottom: calc(var(--u) * 4); }
+  .gate-item[data-ok='true'] { border-left: 4px solid var(--ink-mark); }
+  .verdict { margin-top: calc(var(--u) * 4); font-family: var(--font-mono); font-size: 13px; }
+  .verdict ul { margin: calc(var(--u) * 2) 0 0; padding-left: 1.2em; }
+  .verdict li { margin-bottom: 4px; }
+  .verdict--ok { color: var(--ink); }
+</style>
+
+<script>
+import { STATEMENT, METHODS, problems as sharedProblems } from '../lib/vgp.js';
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const form = $('#gen');
+  let dest = [];
+  let desig = [];
+
+  const slug = (s) => (s || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+  function destRow(d, i) {
+    const el = document.createElement('div');
+    el.className = 'item';
+    el.innerHTML = `
+      <div class="item__head">
+        <span class="item__no">Destination ${String(i + 1).padStart(2, '0')}</span>
+        <button type="button" class="item__del" data-del="dest" data-i="${i}">remove</button>
+      </div>
+      <label>Identifier<input data-f="id" value="${d.id}" placeholder="direct-card" /><small>Lowercase, hyphenated, stable.</small></label>
+      <label>Method<select data-f="type">${METHODS.map((m) => `<option value="${m}"${m === d.type ? ' selected' : ''}>${m}</option>`).join('')}</select></label>
+      <label>Provider<input data-f="provider" value="${d.provider ?? ''}" placeholder="Stripe" /><small>Leave blank if not applicable.</small></label>
+      <label>URL<input data-f="url" value="${d.url ?? ''}" placeholder="https://example.org/donate" /><small>Absolute HTTPS. Leave blank for offline methods such as check.</small></label>
+      <label>Recipient<input data-f="recipient" value="${d.recipient}" placeholder="Example Foundation" /><small>The name the approved flow actually shows the donor.</small></label>
+      <div class="checks">
+        <label><input type="checkbox" data-f="recurring" ${d.recurring ? 'checked' : ''} /> recurring</label>
+        <label><input type="checkbox" data-f="designation_support" ${d.designation_support ? 'checked' : ''} /> designations</label>
+      </div>
+      <label>Restrictions<input data-f="restrictions" value="${d.restrictions ?? ''}" placeholder="Plain-language limits, or blank" /></label>`;
+    el.querySelectorAll('[data-f]').forEach((inp) => {
+      inp.addEventListener('input', () => {
+        const f = inp.getAttribute('data-f');
+        dest[i][f] = inp.type === 'checkbox' ? inp.checked : inp.value;
+        render();
+      });
+    });
+    return el;
+  }
+
+  function desigRow(g, i) {
+    const el = document.createElement('div');
+    el.className = 'item';
+    el.innerHTML = `
+      <div class="item__head">
+        <span class="item__no">Designation ${String(i + 1).padStart(2, '0')}</span>
+        <button type="button" class="item__del" data-del="desig" data-i="${i}">remove</button>
+      </div>
+      <label>Identifier<input data-f="id" value="${g.id}" placeholder="general-fund" /></label>
+      <label>Label<input data-f="label" value="${g.label}" placeholder="General Fund" /></label>
+      <label>Description<input data-f="description" value="${g.description ?? ''}" placeholder="Optional" /></label>`;
+    el.querySelectorAll('[data-f]').forEach((inp) => {
+      inp.addEventListener('input', () => { desig[i][inp.getAttribute('data-f')] = inp.value; render(); });
+    });
+    return el;
+  }
+
+  function gate() {
+    const box = $('#gate');
+    box.innerHTML = '';
+    if (!dest.length) { box.innerHTML = '<p class="fs__note">Add a destination in step 03 first.</p>'; return; }
+    dest.forEach((d, i) => {
+      const ok = d.statement === STATEMENT && (d.role || '').trim().length >= 2;
+      const el = document.createElement('div');
+      el.className = 'gate-item';
+      el.setAttribute('data-ok', String(ok));
+      el.innerHTML = `
+        <div class="item__head">
+          <span class="item__no">${d.id || 'destination ' + (i + 1)}</span>
+          ${ok ? '<span class="authorised">Authorized</span>' : '<span class="not-authorised">Not authorized</span>'}
+        </div>
+        <label>Approver role<input data-g="role" value="${d.role ?? ''}" placeholder="Executive Director" /></label>
+        <label>Type the affirmation exactly<input data-g="statement" value="${d.statement ?? ''}" placeholder="${STATEMENT}" /></label>`;
+      el.querySelectorAll('[data-g]').forEach((inp) => {
+        inp.addEventListener('input', () => { dest[i][inp.getAttribute('data-g')] = inp.value; render(); });
+      });
+      box.appendChild(el);
+    });
+  }
+
+  function build() {
+    const f = Object.fromEntries(new FormData(form).entries());
+    const authorised = dest.filter((d) => d.statement === STATEMENT && (d.role || '').trim().length >= 2);
+    const approved = authorised.length > 0;
+    const val = (v) => (v && String(v).trim() ? String(v).trim() : null);
+
+    return {
+      doc: {
+        vgp_version: '0.1',
+        canonical_domain: val(f.canonical_domain) ?? '',
+        organization: {
+          legal_name: val(f.legal_name),
+          display_name: val(f.display_name),
+          ein: val(f.ein),
+          country: val(f.country) ? String(f.country).trim().toUpperCase() : null,
+        },
+        giving: {
+          // The invariant, in one line: an unapproved document is structurally
+          // incapable of carrying an authorised destination.
+          authorized_destinations: approved ? authorised.map((d) => ({
+            id: d.id, type: d.type,
+            provider: val(d.provider), url: val(d.url),
+            recipient: d.recipient, recurring: !!d.recurring,
+            designation_support: !!d.designation_support,
+            restrictions: val(d.restrictions),
+            authorization: {
+              status: 'authorized',
+              approved_by_role: d.role.trim(),
+              approved_at: new Date().toISOString().replace(/\.\d+Z$/, 'Z'),
+              statement: STATEMENT,
+            },
+          })) : [],
+          designations: desig.filter((g) => g.id && g.label)
+            .map((g) => ({ id: g.id, label: g.label, description: val(g.description) })),
+        },
+        verification: {
+          organization_approved: approved,
+          published_at: approved ? new Date().toISOString().replace(/\.\d+Z$/, 'Z') : null,
+          updated_at: new Date().toISOString().replace(/\.\d+Z$/, 'Z'),
+        },
+      },
+      approved,
+      pending: dest.length - authorised.length,
+    };
+  }
+
+  // One implementation of the rules, shared with /validate.
+  const problems = (doc) => sharedProblems(doc);
+
+  function render() {
+    const { doc, approved, pending } = build();
+    const json = JSON.stringify(doc, null, 2);
+    document.getElementById('out').textContent = json;
+    document.getElementById('state').textContent = approved ? 'approved' : 'draft — unapproved';
+
+    const p = problems(doc, approved);
+    const v = document.getElementById('verdict');
+    if (p.length) {
+      v.className = 'verdict';
+      v.innerHTML = `<strong>Not yet valid</strong><ul>${p.map((x) => `<li>${x}</li>`).join('')}</ul>`;
+    } else if (!approved) {
+      v.className = 'verdict';
+      v.innerHTML = `<strong>Valid unapproved draft.</strong><ul><li>${pending} destination(s) await affirmation in step 04.</li><li>An unapproved declaration exposes no giving tools to an agent. That is the intended behaviour.</li></ul>`;
+    } else {
+      v.className = 'verdict verdict--ok';
+      v.innerHTML = `<strong>Valid approved declaration.</strong><ul><li>${doc.giving.authorized_destinations.length} authorised destination(s).</li>${pending ? `<li>${pending} candidate(s) still unaffirmed and excluded.</li>` : ''}</ul>`;
+    }
+    window.__doc = json;
+  }
+
+  form.addEventListener('input', render);
+  document.addEventListener('click', (e) => {
+    const add = e.target.closest('[data-add]');
+    if (add) {
+      if (add.dataset.add === 'destination') dest.push({ id: '', type: 'credit_card', provider: '', url: '', recipient: '', recurring: false, designation_support: false, restrictions: '', role: '', statement: '' });
+      else desig.push({ id: '', label: '', description: '' });
+      draw();
+    }
+    const del = e.target.closest('[data-del]');
+    if (del) {
+      const i = Number(del.dataset.i);
+      if (del.dataset.del === 'dest') dest.splice(i, 1); else desig.splice(i, 1);
+      draw();
+    }
+  });
+
+  function draw() {
+    const dbox = document.getElementById('destinations'); dbox.innerHTML = '';
+    dest.forEach((d, i) => dbox.appendChild(destRow(d, i)));
+    const gbox = document.getElementById('designations'); gbox.innerHTML = '';
+    desig.forEach((g, i) => gbox.appendChild(desigRow(g, i)));
+    gate(); render();
+  }
+
+  document.getElementById('download').addEventListener('click', () => {
+    const blob = new Blob([window.__doc], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'giving.json'; a.click();
+    URL.revokeObjectURL(a.href);
+  });
+  document.getElementById('copy').addEventListener('click', async (e) => {
+    await navigator.clipboard.writeText(window.__doc);
+    e.target.textContent = 'Copied'; setTimeout(() => (e.target.textContent = 'Copy'), 1400);
+  });
+
+  draw();
+})();
+</script>
+
+</Office>

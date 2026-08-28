@@ -2,18 +2,24 @@
   "vgp_version": "0.1",
   "canonical_domain": "powerpoetry.org",
   "organization": {
-    "legal_name": null,
+    "legal_name": "To Be Heard Foundation",
     "display_name": "Power Poetry",
     "ein": null,
-    "country": null
+    "country": "US"
   },
   "giving": {
     "authorized_destinations": [],
-    "designations": []
+    "designations": [
+      {
+        "id": "power-poetry",
+        "label": "Power Poetry",
+        "description": "Gifts earmarked for the Power Poetry program, received by To Be Heard Foundation."
+      }
+    ]
   },
   "verification": {
     "organization_approved": false,
     "published_at": null,
-    "updated_at": "2026-08-26T00:00:00Z"
+    "updated_at": "2026-08-27T00:00:00Z"
   }
 }
