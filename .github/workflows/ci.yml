@@ -24,3 +24,17 @@ jobs:
       # deliberately stdlib-only so a nonprofit can run them without a toolchain.
       - name: Run the VGP test suite
         run: python tests/run_tests.py
+
+      # The site's URL-fetch endpoint takes a URL from the public, so its SSRF
+      # guards are pinned by tests. They regress silently otherwise.
+      - name: Install site dependencies
+        working-directory: site
+        run: npm ci
+
+      - name: Run the site guard tests
+        working-directory: site
+        run: npm test
+
+      - name: Build the site
+        working-directory: site
+        run: npm run build

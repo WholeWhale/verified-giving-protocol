@@ -125,7 +125,14 @@ function render({ transport, doc, parseError }) {
     html += '<h3>Transport</h3>';
     html += line('Status', t.status ?? '—', t.ok);
     html += line('Media type', t.contentType || 'none sent', jsonish);
-    if (t.redirected) html += line('Redirected to', t.finalUrl);
+    if (t.redirected) {
+      // Specification §2: avoid redirects on the canonical location. Reported
+      // rather than hidden, because an agent resolving this URL pays the same
+      // hops and a redirecting canonical URL is a conformance smell.
+      html += line('Redirects', `${t.chain.length - 1} hop${t.chain.length === 2 ? '' : 's'}`, false);
+      html += `<div class="checkline"><span class="k">Chain</span><span class="mono" style="font-size:12px">${t.chain.map(esc).join('<br>→ ')}</span></div>`;
+      html += `<p class="fs__note" style="margin-top:calc(var(--u)*3)">The specification asks that the canonical location avoid redirects where practical. This resolves, but an agent pays the extra hops and the declaration is not served where it is advertised.</p>`;
+    }
     if (!jsonish && t.contentType) {
       html += `<p class="fs__note" style="margin-top:calc(var(--u)*3)">Served as <span class="mono">${esc(t.contentType)}</span>. A VGP declaration must be <span class="mono">application/json</span>. A page returning HTTP 200 with HTML on every path is what a parked domain does, and an agent should not treat it as a declaration.</p>`;
     }
