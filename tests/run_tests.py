@@ -59,12 +59,14 @@ def test_no_artifact_drift() -> None:
     print("\nartifact drift")
 
     source = ROOT / "skill" / "assets" / "vgp-0.1.schema.json"
-    # Every published copy of the schema, checked against the one source. The
-    # site copy is the one strangers resolve via $id, so it is the worst one to
-    # let drift.
+    # Every copy of the schema in this repository, checked against the one
+    # source. The copy published at verifiedgiving.ai/schema/ — the one
+    # strangers resolve via $id — is no longer checked here because it is no
+    # longer a copy: the site repository generates it from this repository at
+    # build time, pinned as a submodule. Nothing to compare beats something
+    # compared.
     for label, relative in (
         ("vgp/schema.json", "vgp/schema.json"),
-        ("site/public/schema/vgp-0.1.schema.json", "site/public/schema/vgp-0.1.schema.json"),
     ):
         copy = ROOT / relative
         check(

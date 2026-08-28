@@ -8,11 +8,15 @@ web
 
 ## Stack
 
-Astro, deployed to Vercel. The site lives at `site/` inside the existing
-`WholeWhale/verified-giving-protocol` repository rather than a separate repo, so the JSON
-Schema published at `verifiedgiving.ai/schema/` deploys from the same commit that CI
-byte-checks against `skill/assets/vgp-0.1.schema.json`. Publish-parity is then a property
-of the deploy rather than a cross-repo sync job.
+Astro, deployed to Vercel. The site lives in its own repository,
+`WholeWhale/verifiedgiving-site`, so this repository holds the standard and nothing else.
+
+Publish-parity survives the split without a sync job. The site pins this repository as a
+submodule and generates its published artifacts from it at build time: the rendered
+specification comes from `vgp/specification.md`, and the JSON Schema served at
+`verifiedgiving.ai/schema/` is copied from `skill/assets/vgp-0.1.schema.json` before every
+build. There is therefore no second copy to drift — which is a stronger guarantee than the
+byte-check it replaced, since the check could only ever report drift after it happened.
 
 Chosen by the user for these reasons: content-first with zero JS shipped by default, spec
 pages authored as Markdown/MDX so the real specification renders rather than being
