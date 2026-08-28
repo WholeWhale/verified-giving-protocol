@@ -3,30 +3,39 @@
   "canonical_url": "https://www.powerpoetry.org/",
   "retrieved_at": "2026-08-28T00:00:00Z",
   "organization": {
-    "legal_name": "To Be Heard Foundation",
+    "legal_name": "To Be Heard Foundation Inc",
     "display_name": "Power Poetry",
-    "ein": null,
+    "ein": "13-3648963",
     "country": "US",
-    "nonprofit_status_claim": "Unverified. No 501(c)(3) statement or EIN appears on the donation page or the public campaign page.",
+    "nonprofit_status_claim": "IRS Business Master File lists EIN 13-3648963 as a subsection 3 organisation (501(c)(3)), ruling date 1992-04-01, Katonah NY.",
     "donation_contact": null,
     "evidence": [
       {
         "claim": "legal_name",
-        "value": "To Be Heard Foundation",
-        "source_url": "https://www.powerpoetry.org/donate",
-        "page_title": "Donate",
-        "excerpt": "Donations are processed securely by Givebutter on behalf of the To Be Heard Foundation.",
+        "value": "To Be Heard Foundation Inc",
+        "source_url": "https://projects.propublica.org/nonprofits/api/v2/organizations/133648963.json",
+        "page_title": "ProPublica Nonprofit Explorer — IRS Business Master File",
+        "excerpt": "ein 133648963, name \"To Be Heard Foundation Inc\", subsection_code 3, ruling_date 1992-04-01, Katonah NY.",
         "retrieved_at": "2026-08-28T00:00:00Z",
         "confidence": "high"
       },
       {
-        "claim": "legal_name",
-        "value": "To Be Heard Foundation Inc",
-        "source_url": "https://givebutter.com/donate-power-poetry",
-        "page_title": "Donate to Support Young Poets",
-        "excerpt": "To Be Heard Foundation Inc",
+        "claim": "ein",
+        "value": "13-3648963",
+        "source_url": "https://projects.propublica.org/nonprofits/api/v2/organizations/133648963.json",
+        "page_title": "ProPublica Nonprofit Explorer — IRS Business Master File",
+        "excerpt": "Supplied by the organisation and confirmed against the IRS Business Master File; 12 filings on record, most recent tax year 2023.",
         "retrieved_at": "2026-08-28T00:00:00Z",
-        "confidence": "medium"
+        "confidence": "high"
+      },
+      {
+        "claim": "display_name",
+        "value": "Power Poetry",
+        "source_url": "https://www.powerpoetry.org/donate",
+        "page_title": "Donate",
+        "excerpt": "Power Poetry is the public-facing program name; the registered entity receiving the gift is To Be Heard Foundation Inc.",
+        "retrieved_at": "2026-08-28T00:00:00Z",
+        "confidence": "high"
       }
     ]
   },
@@ -36,7 +45,7 @@
       "type": "credit_card",
       "provider": "Givebutter",
       "url": "https://www.powerpoetry.org/donate",
-      "recipient": "To Be Heard Foundation",
+      "recipient": "To Be Heard Foundation Inc",
       "recurring": true,
       "designation_support": false,
       "restrictions": null,
@@ -48,15 +57,6 @@
           "source_url": "https://www.powerpoetry.org/donate",
           "page_title": "Donate",
           "excerpt": "Givebutter widget LvNJXe embedded on the organisation's own donate page; the embedded frame resolves to givebutter.com/embed/c/donate-power-poetry.",
-          "retrieved_at": "2026-08-28T00:00:00Z",
-          "confidence": "high"
-        },
-        {
-          "claim": "recipient",
-          "value": "To Be Heard Foundation",
-          "source_url": "https://www.powerpoetry.org/donate",
-          "page_title": "Donate",
-          "excerpt": "Donations are processed securely by Givebutter on behalf of the To Be Heard Foundation.",
           "retrieved_at": "2026-08-28T00:00:00Z",
           "confidence": "high"
         },
@@ -77,15 +77,22 @@
           "excerpt": "The amount step offers no fund or designation selector; the flow is amount then payment.",
           "retrieved_at": "2026-08-28T00:00:00Z",
           "confidence": "high"
+        },
+        {
+          "claim": "recipient",
+          "value": "To Be Heard Foundation Inc",
+          "source_url": "https://givebutter.com/donate-power-poetry",
+          "page_title": "Donate to Support Young Poets",
+          "excerpt": "The public campaign page names To Be Heard Foundation Inc; powerpoetry.org/donate states donations are processed by Givebutter on behalf of the To Be Heard Foundation.",
+          "retrieved_at": "2026-08-28T00:00:00Z",
+          "confidence": "high"
         }
       ]
     }
   ],
   "conflicts": [],
   "unresolved": [
-    "The EIN for To Be Heard Foundation is not published on the donation page, the public Givebutter campaign, or the site. approve_destination.py refuses to promote a destination for a US organisation without one.",
-    "The legal name appears as 'To Be Heard Foundation' on powerpoetry.org/donate and as 'To Be Heard Foundation Inc' on the Givebutter campaign page. The registered form must be confirmed before publication; VGP will not infer which is the legal entity.",
-    "A nonprofit administrator has not authorized any candidate for publication.",
-    "Only the credit_card pathway was found. Check, DAF, stock, and workplace giving may exist off-site and would each need their own declared destination."
+    "A nonprofit administrator has not authorized this candidate for publication. This is the only remaining blocker, and it cannot be automated: an administrator must affirm, verbatim, \"Our organization authorizes donations through this destination.\"",
+    "Only the credit_card pathway was found. Check, DAF, stock and workplace giving may exist off-site and would each need their own declared destination. Confirmed 2026-08-28 as not yet in scope."
   ]
 }
