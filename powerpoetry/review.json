@@ -1,0 +1,91 @@
+{
+  "review_version": "0.1",
+  "canonical_url": "https://www.powerpoetry.org/",
+  "retrieved_at": "2026-08-28T00:00:00Z",
+  "organization": {
+    "legal_name": "To Be Heard Foundation",
+    "display_name": "Power Poetry",
+    "ein": null,
+    "country": "US",
+    "nonprofit_status_claim": "Unverified. No 501(c)(3) statement or EIN appears on the donation page or the public campaign page.",
+    "donation_contact": null,
+    "evidence": [
+      {
+        "claim": "legal_name",
+        "value": "To Be Heard Foundation",
+        "source_url": "https://www.powerpoetry.org/donate",
+        "page_title": "Donate",
+        "excerpt": "Donations are processed securely by Givebutter on behalf of the To Be Heard Foundation.",
+        "retrieved_at": "2026-08-28T00:00:00Z",
+        "confidence": "high"
+      },
+      {
+        "claim": "legal_name",
+        "value": "To Be Heard Foundation Inc",
+        "source_url": "https://givebutter.com/donate-power-poetry",
+        "page_title": "Donate to Support Young Poets",
+        "excerpt": "To Be Heard Foundation Inc",
+        "retrieved_at": "2026-08-28T00:00:00Z",
+        "confidence": "medium"
+      }
+    ]
+  },
+  "candidates": [
+    {
+      "id": "givebutter-embed",
+      "type": "credit_card",
+      "provider": "Givebutter",
+      "url": "https://www.powerpoetry.org/donate",
+      "recipient": "To Be Heard Foundation",
+      "recurring": true,
+      "designation_support": false,
+      "restrictions": null,
+      "status": "confirmed",
+      "evidence": [
+        {
+          "claim": "donation_destination",
+          "value": "https://www.powerpoetry.org/donate",
+          "source_url": "https://www.powerpoetry.org/donate",
+          "page_title": "Donate",
+          "excerpt": "Givebutter widget LvNJXe embedded on the organisation's own donate page; the embedded frame resolves to givebutter.com/embed/c/donate-power-poetry.",
+          "retrieved_at": "2026-08-28T00:00:00Z",
+          "confidence": "high"
+        },
+        {
+          "claim": "recipient",
+          "value": "To Be Heard Foundation",
+          "source_url": "https://www.powerpoetry.org/donate",
+          "page_title": "Donate",
+          "excerpt": "Donations are processed securely by Givebutter on behalf of the To Be Heard Foundation.",
+          "retrieved_at": "2026-08-28T00:00:00Z",
+          "confidence": "high"
+        },
+        {
+          "claim": "recurring",
+          "value": "true",
+          "source_url": "https://givebutter.com/embed/c/donate-power-poetry",
+          "page_title": "Donate to Support Young Poets",
+          "excerpt": "Choose amount: One-time / Monthly / Yearly",
+          "retrieved_at": "2026-08-28T00:00:00Z",
+          "confidence": "high"
+        },
+        {
+          "claim": "designation_support",
+          "value": "false",
+          "source_url": "https://givebutter.com/embed/c/donate-power-poetry",
+          "page_title": "Donate to Support Young Poets",
+          "excerpt": "The amount step offers no fund or designation selector; the flow is amount then payment.",
+          "retrieved_at": "2026-08-28T00:00:00Z",
+          "confidence": "high"
+        }
+      ]
+    }
+  ],
+  "conflicts": [],
+  "unresolved": [
+    "The EIN for To Be Heard Foundation is not published on the donation page, the public Givebutter campaign, or the site. approve_destination.py refuses to promote a destination for a US organisation without one.",
+    "The legal name appears as 'To Be Heard Foundation' on powerpoetry.org/donate and as 'To Be Heard Foundation Inc' on the Givebutter campaign page. The registered form must be confirmed before publication; VGP will not infer which is the legal entity.",
+    "A nonprofit administrator has not authorized any candidate for publication.",
+    "Only the credit_card pathway was found. Check, DAF, stock, and workplace giving may exist off-site and would each need their own declared destination."
+  ]
+}
