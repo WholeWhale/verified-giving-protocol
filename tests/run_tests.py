@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import copy
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -121,10 +122,23 @@ def test_shipped_documents_validate() -> None:
         check(f"{relative} is valid", result.returncode == 0, result.stderr.strip())
 
     powerpoetry = load(ROOT / "powerpoetry" / "giving.json")
+    # Approved on 2026-08-28 by a board member of the receiving entity, after the
+    # EIN was confirmed against the IRS Business Master File. Until then this
+    # asserted the opposite, because the reference implementation must never claim
+    # approval it has not received.
     check(
-        "powerpoetry/giving.json is still an unapproved draft",
-        powerpoetry["verification"]["organization_approved"] is False,
-        "the reference implementation must not claim approval it has not received",
+        "powerpoetry/giving.json is approved",
+        powerpoetry["verification"]["organization_approved"] is True,
+    )
+    check(
+        "every authorized destination carries the exact affirmation",
+        all(
+            d["authorization"]["statement"] == STATEMENT
+            and d["authorization"]["status"] == "authorized"
+            and d["authorization"]["approved_by_role"].strip()
+            for d in powerpoetry["giving"]["authorized_destinations"]
+        ),
+        "approval may only ever enter through the verbatim statement",
     )
     # The entity question is resolved: Power Poetry is a program of To Be Heard
     # Foundation, and gifts are earmarked to the program but received by the
@@ -134,7 +148,8 @@ def test_shipped_documents_validate() -> None:
     org = powerpoetry["organization"]
     check(
         "powerpoetry names the receiving legal entity",
-        org["legal_name"] == "To Be Heard Foundation",
+        org["legal_name"] == "To Be Heard Foundation Inc",
+        "the registered name per the IRS Business Master File, EIN 13-3648963",
     )
     check(
         "powerpoetry keeps the program as the display name",
@@ -145,10 +160,11 @@ def test_shipped_documents_validate() -> None:
         "the earmarked program is declared as a designation",
         any(d["id"] == "power-poetry" for d in powerpoetry["giving"]["designations"]),
     )
-    # The EIN is the remaining blocker, and the approval gate must still refuse.
+    # The EIN was the last blocker. It is resolved, and the shape is still checked:
+    # a US organization cannot be approved without one.
     check(
-        "powerpoetry still has no EIN, so it cannot be approved",
-        org["ein"] is None,
+        "powerpoetry declares a well-formed EIN",
+        isinstance(org["ein"], str) and re.fullmatch(r"\d{2}-\d{7}", org["ein"]) is not None,
         "a US organization needs a valid EIN before any destination is authorized",
     )
 
@@ -287,18 +303,25 @@ def test_approval_gate() -> None:
         )
         check("unknown candidate id is refused", result.returncode != 0)
 
-        # The Power Poetry case: unresolved identity blocks approval outright.
-        vgp_pp = tmp / "powerpoetry.json"
-        shutil.copyfile(ROOT / "powerpoetry" / "giving.json", vgp_pp)
-        blocked = approve(vgp_pp, STATEMENT)
+        # Unresolved identity blocks approval outright. Built as a fixture rather
+        # than copied from powerpoetry/giving.json, which is where this case used to
+        # be read from. That file is a real declaration: its EIN was confirmed
+        # against the IRS Business Master File on 2026-08-28 and it is now approved,
+        # so reading the invariant off it made the test assert a fact about one
+        # organisation's paperwork rather than about the protocol.
+        vgp_noein = tmp / "no-ein.json"
+        doc_noein = load(draft_template)
+        doc_noein["organization"]["ein"] = None
+        vgp_noein.write_text(json.dumps(doc_noein, indent=2), encoding="utf-8")
+        blocked = approve(vgp_noein, STATEMENT)
         check(
             "unresolved organization identity blocks approval",
             blocked.returncode != 0,
-            "this is exactly why powerpoetry/giving.json cannot be published yet",
+            "a US organization with no EIN must not be publishable",
         )
         check(
-            "the blocked Power Poetry draft was left untouched",
-            load(vgp_pp)["verification"]["organization_approved"] is False,
+            "the blocked draft was left untouched",
+            load(vgp_noein)["verification"]["organization_approved"] is False,
         )
 
         # Happy path: resolved identity plus the exact affirmation.

@@ -2,24 +2,41 @@
   "vgp_version": "0.1",
   "canonical_domain": "powerpoetry.org",
   "organization": {
-    "legal_name": "To Be Heard Foundation",
+    "legal_name": "To Be Heard Foundation Inc",
     "display_name": "Power Poetry",
-    "ein": null,
+    "ein": "13-3648963",
     "country": "US"
   },
   "giving": {
-    "authorized_destinations": [],
+    "authorized_destinations": [
+      {
+        "id": "givebutter-embed",
+        "type": "credit_card",
+        "provider": "Givebutter",
+        "url": "https://www.powerpoetry.org/donate",
+        "recipient": "To Be Heard Foundation Inc",
+        "recurring": true,
+        "designation_support": true,
+        "restrictions": null,
+        "authorization": {
+          "status": "authorized",
+          "approved_by_role": "Board Member, To Be Heard Foundation",
+          "approved_at": "2026-08-28T21:16:22Z",
+          "statement": "Our organization authorizes donations through this destination."
+        }
+      }
+    ],
     "designations": [
       {
         "id": "power-poetry",
         "label": "Power Poetry",
-        "description": "Gifts earmarked for the Power Poetry program, received by To Be Heard Foundation."
+        "description": "Gifts earmarked for the Power Poetry program, received by To Be Heard Foundation Inc."
       }
     ]
   },
   "verification": {
-    "organization_approved": false,
-    "published_at": null,
-    "updated_at": "2026-08-27T00:00:00Z"
+    "organization_approved": true,
+    "published_at": "2026-08-28T21:16:22Z",
+    "updated_at": "2026-08-28T21:16:22Z"
   }
 }
