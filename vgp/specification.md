@@ -20,6 +20,20 @@ Serve it as `application/json` over HTTPS. Avoid redirects where practical.
 
 The publishing domain **is** the authority. VGP asserts nothing about a document served from anywhere else, and a document's `canonical_domain` MUST match the host that served it.
 
+### 2.1 Advertising the declaration
+
+A page MAY advertise the declaration with a link relation:
+
+```html
+<link rel="giving" type="application/json" href="/.well-known/giving.json">
+```
+
+This is a **hint, not a second canonical location.** The well-known path above remains the only normative one, and a consumer that finds no link MUST still try it.
+
+The hint earns its place on a donation page. An agent that has arrived at `/donate` learns that a declaration exists without spending a request on a path that, today, almost never does — and it can distinguish *"this page points at a declaration"* from *"I guessed and got a 404"*, which §3.4 otherwise leaves it unable to tell apart.
+
+Consumers MUST refuse a cross-origin `href`. Only a same-origin link may be followed, and the document it yields is still subject to the `canonical_domain` match above. A consumer that followed a cross-origin hint would let any page nominate another organization's declaration as its own — the unauthorized-fundraising-page problem inverted, with the protocol supplying the credibility.
+
 ## 3. Authorization semantics
 
 This section is the protocol. Everything else is encoding.

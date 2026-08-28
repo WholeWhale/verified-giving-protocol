@@ -1,0 +1,30 @@
+<!--
+  What to add to https://www.powerpoetry.org/donate
+
+  Two lines. Neither changes what a human sees on the page.
+
+  1. The link relation advertises the declaration, so an agent that has arrived
+     at the donate page does not have to guess at /.well-known/. Specification
+     section 2.1. Put it in <head>.
+
+  2. The WebMCP script is the part that matters. Without it an agent on this
+     page sees a cross-origin Givebutter iframe it cannot read, and falls back
+     to guessing from the surrounding prose. With it the page registers four
+     described, schema-typed tools the agent discovers automatically:
+
+       giving_verify        who this organization is, per its own declaration
+       giving_options       the destinations it authorized, and nothing else
+       giving_designations  the funds it says it accepts
+       giving_prepare       builds a donation URL; it never submits or charges
+
+     The script fails closed. If the declaration is missing, unapproved, or
+     served with the wrong media type, it registers NO tools at all, and the
+     agent sees "this site exposes no authorized giving pathway" rather than a
+     plausible form it might use anyway.
+-->
+
+<!-- in <head> -->
+<link rel="giving" type="application/json" href="/.well-known/giving.json">
+
+<!-- before </body> -->
+<script type="module" src="/giving-tools.js"></script>
