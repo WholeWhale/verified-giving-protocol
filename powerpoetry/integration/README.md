@@ -12,7 +12,7 @@ least one destination. The file in this directory's parent is a draft.
 Publish the approved document at the canonical well-known path:
 
 ```
-https://<canonical-domain>/.well-known/giving.json
+https://<canonical-domain>/giving.json
 ```
 
 Requirements:
@@ -22,27 +22,29 @@ Requirements:
 - `canonical_domain` inside the document matches the host serving it
 - No redirect chain where it can be avoided
 
-For a Next.js app, a file at `public/.well-known/giving.json` is served at that path
-directly. For Apache or nginx, confirm the server does not block dotted directories —
-several default configurations deny `.well-known` outside of ACME challenges.
+For a Next.js app, a file at `public/giving.json` is served at that path directly. The
+same is true of most static hosts and CMSs: this is the same place `robots.txt` and
+`ads.txt` live, and anything that can serve those can serve this. That is part of why the
+location is the document root rather than a dotted directory, which several Apache and
+nginx defaults deny outside of ACME challenges.
 
 Verify from outside your network before believing it works:
 
 ```bash
-curl -sSI https://<canonical-domain>/.well-known/giving.json
-curl -sS  https://<canonical-domain>/.well-known/giving.json | python -m json.tool
+curl -sSI https://<canonical-domain>/giving.json
+curl -sS  https://<canonical-domain>/giving.json | python -m json.tool
 ```
 
 ## 2. Register the tools
 
 `../../webmcp/giving-tools.js` is generated from the skill template and defaults to
-fetching `/.well-known/giving.json` on the current origin. If your document lives
+fetching `/giving.json` on the current origin. If your document lives
 elsewhere, regenerate rather than hand-editing:
 
 ```bash
 python ../../skill/scripts/generate_webmcp.py \
   --output giving-tools.js \
-  --vgp-url /.well-known/giving.json
+  --vgp-url /giving.json
 ```
 
 Include it on the pages where a donor would plausibly ask an agent for help — the donate

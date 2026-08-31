@@ -13,19 +13,25 @@ It is not a payment rail, a tax-deductibility opinion, a fraud registry, a nonpr
 Publish the approved document at:
 
 ```
-https://<canonical-domain>/.well-known/giving.json
+https://<canonical-domain>/giving.json
 ```
 
 Serve it as `application/json` over HTTPS. Avoid redirects where practical.
 
 The publishing domain **is** the authority. VGP asserts nothing about a document served from anywhere else, and a document's `canonical_domain` MUST match the host that served it.
 
+The document root is deliberate, and the alternative was `/.well-known/`. Two kinds of file live at a site's root. One describes how to speak a protocol with the server, and belongs under `/.well-known/` — `openid-configuration`, `acme-challenge`. The other is a **policy the owner publishes about what third parties may do**, and has always lived at the root: `robots.txt`, `sitemap.xml`, `ads.txt`.
+
+VGP is the second kind. The nearest analogue is `ads.txt`, in which a domain owner declares who is authorised to sell their inventory, published specifically to defeat unauthorised intermediaries trading on their name. Substitute donations for ad inventory and it is this specification's problem. A useful test: when the file is absent, `/.well-known/openid-configuration` means *this server does not speak that protocol*, while `robots.txt`, `ads.txt` and `giving.json` mean *the owner has declared nothing* — a statement about the owner, not the server. Section 3.4 depends on that reading.
+
+The root also keeps the file legible to people. A programme officer, a journalist, or a board member can open `example.org/giving.json` and read who is authorised, the same way anyone can read a publisher's `ads.txt`. A declaration nobody but an agent can find is harder to hold an organization to.
+
 ### 2.1 Advertising the declaration
 
 A page MAY advertise the declaration with a link relation:
 
 ```html
-<link rel="giving" type="application/json" href="/.well-known/giving.json">
+<link rel="giving" type="application/json" href="/giving.json">
 ```
 
 This is a **hint, not a second canonical location.** The well-known path above remains the only normative one, and a consumer that finds no link MUST still try it.

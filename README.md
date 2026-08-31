@@ -31,7 +31,7 @@ These are not equivalent, and nothing in this repository is permitted to collaps
 
 ```
 Nonprofit domain          VGP is the trust layer
-       |                  /.well-known/giving.json
+       |                  /giving.json
        v                  identity, EIN, authorized destinations, designations
      VGP
        |                  WebMCP is the agent interaction layer

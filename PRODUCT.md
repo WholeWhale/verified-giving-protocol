@@ -25,7 +25,7 @@ retyped, and a single interactive island for the generator.
 ## Users
 
 **Primary: the nonprofit's developer or web agency.** The person actually implementing
-VGP on a nonprofit's site. They arrive knowing roughly what a `.well-known` file is, want
+VGP on a nonprofit's site. They arrive knowing roughly what a root policy file like `robots.txt` or `ads.txt` is, want
 the specification, the schema, copy-paste snippets, and a way to check their work, and
 they leave when `giving.json` is live and validating. Success is measured in about twenty
 minutes from landing to shipped file.
@@ -69,7 +69,7 @@ Constraints they bring with them:
 
 - `/donate` on nonprofit sites is very frequently already a 302 to a third-party processor
   (Classy, Givebutter, Bloomerang, Funraise), which is why the canonical location is
-  `/.well-known/giving.json`.
+  `/giving.json`.
 - Some servers deny dotted directories outside ACME challenges and must be reconfigured.
 - The declaration must be served as JSON over HTTPS with `canonical_domain` matching the
   serving host.
@@ -114,9 +114,11 @@ Terminology that must stay precise: *benefits*, *confirmed*, *authorized*, *dest
 The user set one binding constraint: the site must read as **functional, open-source
 infrastructure that can be trusted** — explicitly not as AI-generated marketing design.
 
-Named as the reference family: securitytxt.org (the closest analog, being a `.well-known`
-standard with a hosted form generator), jsonschema.org, letsencrypt.org, sqlite.org,
-curl.se, and the IETF datatracker.
+Named as the reference family: securitytxt.org (a policy-file standard with a hosted form
+generator), jsonschema.org, letsencrypt.org, sqlite.org, curl.se, and the IETF
+datatracker. The closest structural analog is **ads.txt**: a root file in which a domain
+owner declares who is authorised to act on their behalf, published to defeat unauthorised
+intermediaries. That is VGP's problem with donations substituted for ad inventory.
 
 Named as prohibited: gradient meshes, glassmorphism, floating rounded cards over heroes,
 icon-circle feature grids, emoji section headers, centered value-proposition heroes, and

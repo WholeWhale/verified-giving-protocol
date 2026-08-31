@@ -8,7 +8,7 @@ VGP lets the organization controlling a canonical domain publish the giving dest
 
 Publish the approved document at:
 
-`https://<canonical-domain>/.well-known/giving.json`
+`https://<canonical-domain>/giving.json`
 
 Serve it as `application/json` over HTTPS. Avoid redirects when practical.
 

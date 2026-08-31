@@ -1,6 +1,6 @@
 ---
 name: vgpify
-description: Analyze a nonprofit website, discover its organization identity and giving pathways, flag conflicts, and generate an evidence-backed draft Verified Giving Protocol (VGP) declaration plus optional WebMCP tools. Use for requests such as "vgpify this nonprofit," auditing whether a donation destination is authorized, preparing `/.well-known/giving.json`, comparing a third-party giving page against a nonprofit's declaration, or making a nonprofit website agent-ready for giving. Never infer authorization from discovery evidence.
+description: Analyze a nonprofit website, discover its organization identity and giving pathways, flag conflicts, and generate an evidence-backed draft Verified Giving Protocol (VGP) declaration plus optional WebMCP tools. Use for requests such as "vgpify this nonprofit," auditing whether a donation destination is authorized, preparing `/giving.json`, comparing a third-party giving page against a nonprofit's declaration, or making a nonprofit website agent-ready for giving. Never infer authorization from discovery evidence.
 ---
 
 # VGPify
@@ -133,7 +133,7 @@ After at least one destination is authorized, generate the integration:
 ```bash
 python3 <skill-dir>/scripts/generate_webmcp.py \
   --output integration/giving-tools.js \
-  --vgp-url /.well-known/giving.json
+  --vgp-url /giving.json
 ```
 
 The generated tools expose:
@@ -159,7 +159,7 @@ node --check integration/giving-tools.js
 
 Also verify manually:
 
-- `/.well-known/giving.json` resolves on the canonical HTTPS domain.
+- `/giving.json` resolves on the canonical HTTPS domain.
 - Tool responses contain only approved VGP destinations.
 - An absent third-party destination produces `not listed as authorized`, not `fraudulent`.
 - `giving_prepare` does not initiate payment.

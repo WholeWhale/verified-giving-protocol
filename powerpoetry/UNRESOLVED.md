@@ -43,6 +43,6 @@ organisation stating the relationship is exactly the gap the protocol closes:
 3. For each candidate, a nonprofit administrator affirms, verbatim:
    *"Our organization authorizes donations through this destination."*
 4. Promote approved candidates with `skill/scripts/approve_destination.py`.
-5. Validate, then serve at `https://powerpoetry.org/.well-known/giving.json`.
+5. Validate, then serve at `https://powerpoetry.org/giving.json`.
 
 Steps 2 and 3 are human decisions. There is no automated path around them.

@@ -11,7 +11,7 @@ Official sources:
 
 ## VGP rules
 
-- Load VGP from the site's same-origin `/.well-known/giving.json`.
+- Load VGP from the site's same-origin `/giving.json`.
 - Refuse to register authoritative giving tools if the document is not organization-approved.
 - Return only entries in `giving.authorized_destinations` with `authorization.status === "authorized"`.
 - Mark verify/options/designations as read-only.

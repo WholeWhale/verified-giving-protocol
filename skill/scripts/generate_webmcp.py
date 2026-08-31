@@ -10,7 +10,7 @@ from pathlib import Path
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", required=True, type=Path)
-    parser.add_argument("--vgp-url", default="/.well-known/giving.json")
+    parser.add_argument("--vgp-url", default="/giving.json")
     args = parser.parse_args()
 
     if not args.vgp_url.startswith("/") and not args.vgp_url.startswith("https://"):

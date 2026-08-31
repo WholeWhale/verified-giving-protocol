@@ -6,7 +6,7 @@
 (async () => {
   "use strict";
 
-  const VGP_URL = "/.well-known/giving.json";
+  const VGP_URL = "/giving.json";
   const REQUIRED_STATEMENT =
     "Our organization authorizes donations through this destination.";
 
