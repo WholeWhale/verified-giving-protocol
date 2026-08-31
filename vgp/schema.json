@@ -268,6 +268,14 @@
           "type": "string",
           "minLength": 1
         },
+        "currency": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z]{3}$",
+          "description": "ISO 4217 code the destination charges in. Required for online methods: an amount without a currency is not an amount, and a consumer MUST NOT infer one from the organization's country."
+        },
         "recurring": {
           "type": "boolean"
         },
@@ -346,6 +354,14 @@
                       "type": "string"
                     },
                     "description": "Required when kind is enum. The platform's exact vocabulary; a consumer MUST NOT send a value outside it."
+                  },
+                  "min": {
+                    "type": "number",
+                    "description": "Optional. Smallest value the platform will accept for this parameter."
+                  },
+                  "max": {
+                    "type": "number",
+                    "description": "Optional. Largest value the platform will accept. A consumer MUST omit the parameter rather than send a value outside these bounds, because a platform that silently ignores an out-of-range value leaves the donor on a default the agent never chose."
                   }
                 }
               }

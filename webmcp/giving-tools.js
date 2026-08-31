@@ -93,6 +93,19 @@
         rejected.push(key);
         continue;
       }
+      // Out of declared bounds is dropped, not clamped. Platforms tend to ignore an
+      // out-of-range value silently, which would leave the donor on a default this
+      // agent never chose while the agent believes the amount was carried. Handing
+      // over an unprefilled URL is the honest outcome. Clamping would be worse
+      // still: it would donate an amount nobody asked for.
+      const numeric = Number(value);
+      if (
+        (rule.min !== undefined && numeric < rule.min) ||
+        (rule.max !== undefined && numeric > rule.max)
+      ) {
+        rejected.push(key);
+        continue;
+      }
       template = template.replace(`{${key}}`, encodeURIComponent(String(value)));
     }
 

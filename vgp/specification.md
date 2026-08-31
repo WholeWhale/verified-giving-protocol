@@ -140,6 +140,7 @@ When `organization_approved` is `true`, `legal_name`, `display_name`, and `count
 | `provider` | Processor or provider name, or `null`. |
 | `url` | Absolute HTTPS URL for online methods; `null` for offline methods such as `check`. |
 | `recipient` | The legal or named recipient the approved flow actually shows the donor. |
+| `currency` | ISO 4217 code the destination charges in. Required for online methods. |
 | `recurring` | Boolean. |
 | `designation_support` | Boolean. |
 | `restrictions` | Plain-language limitations, or `null`. |
@@ -177,6 +178,9 @@ Normative rules for a consumer:
 3. Remove any placeholder left unfilled, together with the query key carrying it. A literal `{frequency}` MUST NOT be sent to a payment platform.
 4. Refuse a `url_template` whose origin differs from the destination's `url`. A declaration that moves the donor to another origin is not describing its own destination.
 5. `verified_at` records when the template was last checked against the live platform. A consumer MAY decline to use a stale template.
+6. Where a parameter declares `min` or `max`, a consumer MUST omit the parameter entirely rather than send a value outside them. Platforms commonly ignore an out-of-range value in silence, which leaves the donor on a default the agent did not choose and believes it did not accept. Handing over an unprefilled URL is the honest outcome.
+
+An amount is not an amount without a currency. `currency` is required on any destination with an online method, and a consumer MUST NOT infer one from `organization.country`: a US organization may perfectly well collect in CAD.
 
 Prefilling does not make the tool transactional. `giving_prepare` still returns a URL, and the donor still authorizes the payment.
 
