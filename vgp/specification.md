@@ -34,7 +34,7 @@ A page MAY advertise the declaration with a link relation:
 <link rel="giving" type="application/json" href="/giving.json">
 ```
 
-This is a **hint, not a second canonical location.** The well-known path above remains the only normative one, and a consumer that finds no link MUST still try it.
+This is a **hint, not a second canonical location.** The document root above remains the only normative one, and a consumer that finds no link MUST still try it.
 
 The hint earns its place on a donation page. An agent that has arrived at `/donate` learns that a declaration exists without spending a request on a path that, today, almost never does — and it can distinguish *"this page points at a declaration"* from *"I guessed and got a 404"*, which §3.4 otherwise leaves it unable to tell apart.
 
