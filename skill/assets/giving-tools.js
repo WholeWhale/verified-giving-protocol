@@ -60,6 +60,63 @@
     ? vgp.giving.designations
     : [];
 
+  // Fill only what the organization declared fillable.
+  //
+  // A consumer must never reverse-engineer a donation platform's query string.
+  // Givebutter, Classy, Bloomerang and Blackbaud each name and spell these fields
+  // differently, and a platform may change them without notice, so an inferred
+  // parameter fails silently in the worst possible place: the donor believes they
+  // set up a monthly gift and did not. Everything here comes from the declaration,
+  // and anything not declared is left to the human.
+  function buildPrefillUrl(destination, requested) {
+    const spec = destination.prefill;
+    const rejected = [];
+    if (!spec || !spec.url_template) {
+      for (const [key, value] of Object.entries(requested)) {
+        if (value !== undefined && value !== null) rejected.push(key);
+      }
+      return { url: destination.url, applied: false, rejected };
+    }
+
+    let template = spec.url_template;
+    const declared = spec.parameters ?? {};
+
+    for (const [key, value] of Object.entries(requested)) {
+      if (value === undefined || value === null) continue;
+      const rule = declared[key];
+      if (!rule) {
+        rejected.push(key);
+        continue;
+      }
+      if (rule.kind === "enum" && !(rule.values ?? []).includes(String(value))) {
+        // The platform's vocabulary is the platform's. "recurring" is not "monthly".
+        rejected.push(key);
+        continue;
+      }
+      template = template.replace(`{${key}}`, encodeURIComponent(String(value)));
+    }
+
+    // Drop any placeholder left unfilled, and the query key that carried it, so a
+    // literal "{frequency}" is never sent to a payment platform.
+    template = template
+      .replace(/[?&][^?&=]+=\{[^}]+\}/g, "")
+      .replace(/\{[^}]+\}/g, "")
+      .replace(/\?&/, "?")
+      .replace(/[?&]$/, "");
+
+    // A prefill template may not move the donor to another origin. If it does, the
+    // declaration is not describing its own destination and is not followed.
+    try {
+      if (new URL(template).origin !== new URL(destination.url).origin) {
+        return { url: destination.url, applied: false, rejected: [...rejected, "cross_origin_template"] };
+      }
+    } catch {
+      return { url: destination.url, applied: false, rejected: [...rejected, "malformed_template"] };
+    }
+
+    return { url: template, applied: template !== destination.url, rejected };
+  }
+
   await document.modelContext.registerTool({
     name: "giving_verify",
     description:
@@ -128,9 +185,14 @@
           type: "string",
           description: "Optional authorized destination ID; defaults to the first online destination.",
         },
+        frequency: {
+          type: "string",
+          description:
+            "Optional giving frequency. Permitted values are declared per destination in prefill.parameters.frequency.values and differ between platforms; read them from giving_options rather than assuming.",
+        },
       },
     },
-    execute: async ({ amount, designation, destination_id }) => {
+    execute: async ({ amount, designation, destination_id, frequency }) => {
       if (!Number.isFinite(amount) || amount <= 0 || amount > 1000000) {
         throw new Error("Amount is outside the permitted range.");
       }
@@ -145,13 +207,17 @@
         throw new Error("No matching authorized online destination is available.");
       }
 
+      const prepared = buildPrefillUrl(destination, { amount, frequency });
+
       return {
         destination_id: destination.id,
         recipient: destination.recipient,
-        authorized_url: destination.url,
+        authorized_url: prepared.url,
+        prefill_rejected: prepared.rejected,
         requested_amount: amount,
         requested_designation: designation ?? null,
-        prefill_applied: false,
+        requested_frequency: frequency ?? null,
+        prefill_applied: prepared.applied,
         payment_completed: false,
         requires_human_payment_authorization: true,
       };

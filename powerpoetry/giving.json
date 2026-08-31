@@ -23,6 +23,23 @@
           "approved_by_role": "Board Member, To Be Heard Foundation",
           "approved_at": "2026-08-28T21:16:22Z",
           "statement": "Our organization authorizes donations through this destination."
+        },
+        "prefill": {
+          "url_template": "https://www.powerpoetry.org/donate?amount={amount}&frequency={frequency}",
+          "parameters": {
+            "amount": {
+              "kind": "amount"
+            },
+            "frequency": {
+              "kind": "enum",
+              "values": [
+                "once",
+                "monthly",
+                "yearly"
+              ]
+            }
+          },
+          "verified_at": "2026-08-31"
         }
       }
     ],
@@ -37,6 +54,6 @@
   "verification": {
     "organization_approved": true,
     "published_at": "2026-08-28T21:16:22Z",
-    "updated_at": "2026-08-28T21:16:22Z"
+    "updated_at": "2026-08-31T00:00:00Z"
   }
 }

@@ -145,6 +145,35 @@ When `organization_approved` is `true`, `legal_name`, `display_name`, and `count
 
 Publish only designations the organization confirms it currently accepts. IDs are stable and separate from labels. Navigation labels scraped from a website are not funds.
 
+### 4.4 Prefill
+
+A destination MAY declare how to reach it with fields already filled:
+
+```json
+"prefill": {
+  "url_template": "https://example.org/donate?amount={amount}&frequency={frequency}",
+  "parameters": {
+    "amount":    { "kind": "amount" },
+    "frequency": { "kind": "enum", "values": ["once", "monthly", "yearly"] }
+  },
+  "verified_at": "2026-08-31"
+}
+```
+
+`prefill` is optional and a document without it remains conformant.
+
+**A consumer MUST NOT infer these parameters.** Donation platforms name and spell them differently — Givebutter accepts `frequency=monthly`, and `frequencyOptions`, `recurring` and `interval` are silently ignored — and a platform may change them without notice. An inferred parameter therefore fails in the worst available place: the donor believes they have set up a recurring gift and has not. Only the organization may declare this mapping, for the same reason only the organization may authorize a destination.
+
+Normative rules for a consumer:
+
+1. Fill **only** the keys present in `parameters`. Any other field MUST be left to the human.
+2. Where `kind` is `enum`, send only a value listed in `values`. The platform's vocabulary is the platform's; `recurring` is not `monthly`.
+3. Remove any placeholder left unfilled, together with the query key carrying it. A literal `{frequency}` MUST NOT be sent to a payment platform.
+4. Refuse a `url_template` whose origin differs from the destination's `url`. A declaration that moves the donor to another origin is not describing its own destination.
+5. `verified_at` records when the template was last checked against the live platform. A consumer MAY decline to use a stale template.
+
+Prefilling does not make the tool transactional. `giving_prepare` still returns a URL, and the donor still authorizes the payment.
+
 ## 5. Consumer conformance
 
 A conforming consumer:

@@ -385,6 +385,19 @@ def test_sources_parse() -> None:
             capture_output=True, text=True,
         )
         check("webmcp/giving-tools.js parses", result.returncode == 0, result.stderr)
+
+        # The prefill builder decides what an agent may put in front of a donor,
+        # so its refusals are protocol surface, not implementation detail. Run
+        # them here rather than in a separate JS suite nothing invokes.
+        prefill = subprocess.run(
+            [node, "--test", str(ROOT / "webmcp" / "prefill.test.mjs")],
+            capture_output=True, text=True,
+        )
+        check(
+            "prefill builder refuses undeclared and cross-origin input",
+            prefill.returncode == 0,
+            prefill.stdout[-800:] or prefill.stderr[-800:],
+        )
     else:
         print("  skip  node --check (node not on PATH)")
 
