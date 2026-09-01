@@ -1,0 +1,69 @@
+<!--
+  Schema.org markup for https://www.powerpoetry.org/donate
+
+  WHY THIS EXISTS ALONGSIDE giving.json
+
+  VGP is the authoritative declaration, but no agent looks for /giving.json yet
+  because VGP has no consumers. Schema.org is what today's agents already read.
+  This markup restates a SUBSET of the declaration in a vocabulary that ChatGPT,
+  Gemini, Perplexity and search crawlers parse today.
+
+  It is not a second source of truth. Every value here appears in
+  /giving.json, which remains the authority. If they ever disagree,
+  giving.json is correct and this is stale.
+
+  Three things it adds that the current markup omits, and that an agent asked
+  "who receives this donation" cannot otherwise answer:
+
+    legalName        the entity, as distinct from the "Power Poetry" brand
+    taxID            the EIN, so the claim is checkable against IRS records
+    nonprofitStatus  the 501(c)(3) claim, stated rather than implied
+
+  And DonateAction with an EntryPoint urlTemplate is the existing web standard
+  for what VGP calls prefill: it tells an agent how to construct a donation URL
+  with the amount and frequency already set. An agent that has never heard of
+  VGP can use this today.
+-->
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "NGO",
+  "@id": "https://www.powerpoetry.org/#organization",
+  "name": "Power Poetry",
+  "legalName": "To Be Heard Foundation Inc",
+  "alternateName": "PowerPoetry.org",
+  "taxID": "13-3648963",
+  "nonprofitStatus": "Nonprofit501c3",
+  "url": "https://www.powerpoetry.org",
+  "description": "The largest online poetry community for teens. Write poems, share your voice, and find others like you.",
+  "subjectOf": {
+    "@type": "DataDownload",
+    "name": "Verified Giving Protocol declaration",
+    "encodingFormat": "application/json",
+    "contentUrl": "https://powerpoetry.org/giving.json"
+  },
+  "potentialAction": {
+    "@type": "DonateAction",
+    "name": "Donate to Power Poetry",
+    "recipient": {
+      "@type": "NGO",
+      "name": "To Be Heard Foundation Inc",
+      "taxID": "13-3648963"
+    },
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://www.powerpoetry.org/donate?amount={amount}&frequency={frequency}",
+      "encodingType": "text/html",
+      "httpMethod": "GET",
+      "description": "amount is a number from 1 to 999 in USD. frequency is once, monthly or yearly. Omit either parameter rather than sending a value outside these ranges; the donation platform ignores out-of-range values silently."
+    },
+    "priceSpecification": {
+      "@type": "PriceSpecification",
+      "priceCurrency": "USD",
+      "minPrice": 1,
+      "maxPrice": 999
+    }
+  }
+}
+</script>
