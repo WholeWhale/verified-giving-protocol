@@ -152,6 +152,8 @@ When `organization_approved` is `true`, `legal_name`, `display_name`, and `count
 
 Publish only designations the organization confirms it currently accepts. IDs are stable and separate from labels. Navigation labels scraped from a website are not funds.
 
+`designation_support` describes **donor choice**, not earmarking. It is `true` only where the donor is offered a designation at checkout. A destination whose gifts are all directed to one programme by the organization sets it `false` and states the earmarking in `restrictions`: the donor selects nothing, so a consumer that offered them a choice would be inventing one. The two are easy to conflate and mean different things to an agent — one is a field it may fill, the other is a fact it should repeat.
+
 ### 4.4 Prefill
 
 A destination MAY declare how to reach it with fields already filled:

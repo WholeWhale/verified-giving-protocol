@@ -47,8 +47,8 @@
       "url": "https://www.powerpoetry.org/donate",
       "recipient": "To Be Heard Foundation Inc",
       "recurring": true,
-      "designation_support": true,
-      "restrictions": null,
+      "designation_support": false,
+      "restrictions": "All gifts through this destination are designated to the Power Poetry program and are received by To Be Heard Foundation Inc. The donor is not offered a choice of fund at checkout.",
       "status": "confirmed",
       "evidence": [
         {
@@ -80,11 +80,11 @@
         },
         {
           "claim": "designation_support",
-          "value": "true",
-          "source_url": "https://www.powerpoetry.org/donate",
-          "page_title": "Stated by the organisation",
-          "excerpt": "Gifts through this destination are designated to the Power Poetry program, which is declared as designation id 'power-poetry'. Supplied by the organisation on 2026-08-28. The donation widget's amount step shows no fund selector, so this is a designation the organisation applies, not a choice presented to the donor.",
-          "retrieved_at": "2026-08-28T00:00:00Z",
+          "value": "false",
+          "source_url": "https://givebutter.com/embed/c/donate-power-poetry",
+          "page_title": "Rendered donation widget",
+          "excerpt": "No fund selector appears at any step, and the parameters fund, designation and fund_code have no effect. Gifts are designated to the Power Poetry program by the organisation rather than chosen by the donor, so the fact is recorded in restrictions; designation_support describes donor choice, which is not offered.",
+          "retrieved_at": "2026-08-31T00:00:00Z",
           "confidence": "high"
         }
       ]
@@ -93,7 +93,6 @@
   "conflicts": [],
   "unresolved": [
     "A nonprofit administrator has not authorized this candidate for publication. This is the only remaining blocker, and it cannot be automated: an administrator must affirm, verbatim, \"Our organization authorizes donations through this destination.\"",
-    "Only the credit_card pathway was found. Check, DAF, stock and workplace giving may exist off-site and would each need their own declared destination. Confirmed 2026-08-28 as not yet in scope.",
-    "VGP 0.1 s4.2 defines designation_support only as \"Boolean\". It does not say whether the flag means the donor may choose a designation at checkout or that gifts through the destination are designated by the organisation. Two implementers will read it differently. Worth closing in the specification before adoption."
+    "Only the credit_card pathway was found. Check, DAF, stock and workplace giving may exist off-site and would each need their own declared destination. Confirmed 2026-08-28 as not yet in scope."
   ]
 }

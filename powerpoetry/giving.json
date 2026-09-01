@@ -17,8 +17,8 @@
         "recipient": "To Be Heard Foundation Inc",
         "currency": "USD",
         "recurring": true,
-        "designation_support": true,
-        "restrictions": null,
+        "designation_support": false,
+        "restrictions": "All gifts through this destination are designated to the Power Poetry program and are received by To Be Heard Foundation Inc. The donor is not offered a choice of fund at checkout.",
         "authorization": {
           "status": "authorized",
           "approved_by_role": "Board Member, To Be Heard Foundation",
