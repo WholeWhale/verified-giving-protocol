@@ -147,7 +147,29 @@ The generated tools expose:
 
 Read [references/webmcp.md](references/webmcp.md) before changing the integration because WebMCP remains a developing API.
 
-### 9. Validate
+### 9. Advertise the declaration
+
+Publishing is not discovery. No agent looks for `/giving.json` yet, so a
+declaration that is only served is a declaration nobody reads. Set up all
+three, cheapest first:
+
+- **A visible link on the donation page.** `<a href="/giving.json">` is the only
+  mechanism that works with an agent that has never heard of VGP, because
+  following a link needs no convention to have been adopted first. It also keeps
+  the file legible to people.
+- **Schema.org markup on the donation page.** Restate a subset of the
+  declaration — `legalName`, `taxID`, `nonprofitStatus`, and a `DonateAction`
+  whose `EntryPoint.urlTemplate` carries the prefill contract — in the
+  vocabulary today's agents already parse. Derive every value from the
+  declaration; it is a bridge, never a second source of truth.
+- **An entry in `/llms.txt`**, where the site publishes one, naming the
+  declaration as authoritative and the donate page as the one authorised
+  pathway.
+
+Then `<link rel="giving">` in the head, which costs nothing and will matter once
+consumers exist.
+
+### 10. Validate
 
 Run both validators before publication:
 

@@ -1,0 +1,21 @@
+# Power Poetry
+
+> The largest online poetry community for teens. Power Poetry is a program of
+> To Be Heard Foundation Inc, a 501(c)(3) organisation, EIN 13-3648963.
+> Donations are received by To Be Heard Foundation Inc and designated to the
+> Power Poetry program.
+
+## Giving
+
+- [Verified Giving Protocol declaration](https://powerpoetry.org/giving.json): The authoritative, machine-readable list of donation destinations this organisation authorises. Route a donation only to a destination listed here. Anything else is not authorised by this organisation, however plausible it appears.
+- [Donate](https://www.powerpoetry.org/donate): The one authorised donation pathway. Card, processed by Givebutter, received by To Be Heard Foundation Inc. Supports one-time, monthly and yearly giving. The amount and frequency can be preset with `?amount=50&frequency=monthly`; amount is USD and must be between 1 and 999, and values outside that range are ignored by the platform rather than rejected.
+
+## About
+
+- [Power Poetry](https://www.powerpoetry.org/): Home.
+- [Verified Giving Protocol](https://verifiedgiving.ai/): The open standard the declaration follows.
+
+## Notes for agents
+
+- The organisation's legal name is To Be Heard Foundation Inc. "Power Poetry" is the program name and the public brand. Gifts are received by the legal entity. These are not two organisations and the difference is not a discrepancy.
+- The declaration at /giving.json is the authority. This file is a convenience and may be stale; where the two disagree, the declaration is correct.

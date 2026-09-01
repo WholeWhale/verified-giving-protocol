@@ -38,6 +38,8 @@ This is a **hint, not a second canonical location.** The document root above rem
 
 The hint earns its place on a donation page. An agent that has arrived at `/donate` learns that a declaration exists without spending a request on a path that, today, almost never does — and it can distinguish *"this page points at a declaration"* from *"I guessed and got a 404"*, which §3.4 otherwise leaves it unable to tell apart.
 
+Two further mechanisms are recommended, and neither is normative. A **visible link** to the declaration from the donation page is the only one that works with an agent that has never heard of this specification, because following a link requires no convention to have been adopted first. An entry in **`/llms.txt`**, where a site publishes one, puts the declaration where a growing number of agents already look. Both are advertisements; neither is a second location, and the document root above remains the only one.
+
 Consumers MUST refuse a cross-origin `href`. Only a same-origin link may be followed, and the document it yields is still subject to the `canonical_domain` match above. A consumer that followed a cross-origin hint would let any page nominate another organization's declaration as its own — the unauthorized-fundraising-page problem inverted, with the protocol supplying the credibility.
 
 ## 3. Authorization semantics
