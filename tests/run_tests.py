@@ -68,12 +68,33 @@ def test_no_artifact_drift() -> None:
     # compared.
     for label, relative in (
         ("vgp/schema.json", "vgp/schema.json"),
+        (
+            "skills/verified-giving/assets/vgp-0.1.schema.json",
+            "skills/verified-giving/assets/vgp-0.1.schema.json",
+        ),
     ):
         copy = ROOT / relative
         check(
             f"{label} is byte-identical to the skill copy",
             copy.exists() and copy.read_bytes() == source.read_bytes(),
             "the standard must not disagree with its own tooling",
+        )
+
+    # skills/verified-giving/ ships its own copies of the scripts and templates so the
+    # directory is self-contained and installable on its own. A copy nobody compares
+    # is a copy that drifts, and these two decide whether a destination may be
+    # authorized at all.
+    for relative in (
+        "scripts/validate_vgp.py",
+        "scripts/approve_destination.py",
+        "assets/giving.draft.template.json",
+    ):
+        canonical = ROOT / "skill" / relative
+        shipped = ROOT / "skills" / "verified-giving" / relative
+        check(
+            f"skills/verified-giving/{relative} is byte-identical to the skill copy",
+            shipped.exists() and shipped.read_bytes() == canonical.read_bytes(),
+            "the authoring skill must not ship a stale validator or approval gate",
         )
 
     with tempfile.TemporaryDirectory() as raw:
