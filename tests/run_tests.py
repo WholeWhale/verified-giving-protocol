@@ -398,6 +398,20 @@ def test_sources_parse() -> None:
             prefill.returncode == 0,
             prefill.stdout[-800:] or prefill.stderr[-800:],
         )
+
+        # No shipping client implements WebMCP, so this harness stands in for one:
+        # it provides the registerTool surface and asserts what does and does not
+        # get registered. The negative is the point — an unapproved declaration
+        # must register nothing at all.
+        harness = subprocess.run(
+            [node, "--test", str(ROOT / "webmcp" / "harness.test.mjs")],
+            capture_output=True, text=True,
+        )
+        check(
+            "WebMCP tools register on approval and refuse to on an unapproved document",
+            harness.returncode == 0,
+            harness.stdout[-800:] or harness.stderr[-800:],
+        )
     else:
         print("  skip  node --check (node not on PATH)")
 
