@@ -42,7 +42,42 @@
               ]
             }
           },
-          "verified_at": "2026-08-31"
+          "verified_at": "2026-09-04"
+        },
+        "checkout_observed": {
+          "amount_parameter_means": "gift_to_organization",
+          "donee_of_record": null,
+          "adds_at_checkout": [
+            {
+              "kind": "processing_fee_cover",
+              "recipient": null,
+              "preselected": true,
+              "default_percent": null,
+              "default_note": "Observed as $3.30 added to a $100 monthly gift, shown above the payment methods with a Change link beside it.",
+              "donor_can_decline": true
+            },
+            {
+              "kind": "platform_tip",
+              "recipient": "Givebutter",
+              "preselected": true,
+              "default_percent": 15,
+              "default_note": "A stepper defaulted to 15%, adjustable by the donor. The checkout displays no combined total, so the tip is not visible as a dollar figure before the payment method is chosen.",
+              "donor_can_decline": true
+            }
+          ],
+          "organization_receives": "full_gift",
+          "designations_honored": null,
+          "donor_disclosure": "To Be Heard Foundation receives your full gift. Givebutter’s checkout pre-selects a 15% tip to Givebutter and a processing-fee contribution on top of it, so a $100 monthly gift is charged at roughly $118.30 per month unless you change both.",
+          "verified_at": "2026-09-04"
+        },
+        "agent_payment": {
+          "agent_may_complete_payment": false,
+          "supported_protocols": [],
+          "checkout_session_endpoint": null,
+          "idempotency": "unsupported",
+          "completion_signal": "none",
+          "handoff": "Prepare the URL and hand it to the donor. Givebutter offers no way for an agent to open a checkout session, no idempotency key, and no signal that a gift completed, so an agent MUST stop here and MUST NOT tell the donor the gift is made. If the donor wants confirmation, To Be Heard Foundation can confirm it at help@powerpoetry.org.",
+          "verified_at": "2026-09-04"
         }
       }
     ],
@@ -57,6 +92,6 @@
   "verification": {
     "organization_approved": true,
     "published_at": "2026-08-28T21:16:22Z",
-    "updated_at": "2026-08-31T00:00:00Z"
+    "updated_at": "2026-09-04T00:00:00Z"
   }
 }

@@ -371,6 +371,175 @@
               "description": "Date the template was last checked against the live platform. A consumer MAY decline to use a stale template."
             }
           }
+        },
+        "checkout_observed": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Optional. What the checkout does to the donor's number between the amount an agent sends and the amount the organization receives. The subject here is a third-party platform's behaviour, which the organization observes but does not control, so this object carries verified_at on the same terms as prefill. A consumer MUST treat these values as a disclosure to repeat, never as a setting: no value written here changes what the platform does.",
+          "additionalProperties": false,
+          "required": [
+            "amount_parameter_means",
+            "organization_receives",
+            "verified_at"
+          ],
+          "properties": {
+            "amount_parameter_means": {
+              "enum": [
+                "gift_to_organization",
+                "total_charged_to_donor"
+              ],
+              "description": "What the amount an agent sends actually denotes. Where it is gift_to_organization, everything in adds_at_checkout is charged on top, and the donor's total is higher than the number the agent chose."
+            },
+            "donee_of_record": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "The entity that legally receives the donation where that is not the organization itself. Null where the organization is the donee."
+            },
+            "adds_at_checkout": {
+              "type": "array",
+              "description": "Amounts the checkout adds to the donor's charge beyond the gift. An empty array asserts the donor is charged the gift and nothing further.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "preselected"
+                ],
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "platform_tip",
+                      "processing_fee_cover",
+                      "other"
+                    ]
+                  },
+                  "recipient": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "description": "Who receives this addition, where it is not the organization."
+                  },
+                  "preselected": {
+                    "type": "boolean",
+                    "description": "True where the checkout defaults this on and the donor must act to remove it. This is the field that makes the donor's total differ from the agent's number by default, and the reason an agent that quotes only the amount it sent quotes the wrong figure."
+                  },
+                  "default_percent": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "default_note": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "description": "The observed default in plain language, where a percentage does not capture it. Untrusted display text."
+                  },
+                  "donor_can_decline": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            "organization_receives": {
+              "enum": [
+                "full_gift",
+                "gift_less_fees",
+                "unknown"
+              ],
+              "description": "What reaches the organization from the gift line after any platform or disbursement deduction. Use unknown rather than guessing: an overstated figure is the harmful direction."
+            },
+            "designations_honored": {
+              "type": [
+                "boolean",
+                "null"
+              ],
+              "description": "False where the flow is obliged to disburse unrestricted regardless of any designation the donor selects. A consumer MUST NOT present a designation as binding where this is false."
+            },
+            "donor_disclosure": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "The organization's own one-sentence statement of what the donor will be charged and what the organization will receive. Present so an agent repeats a declaration rather than composing one from the fields above, which would be inference. Untrusted display text under section 5."
+            },
+            "verified_at": {
+              "type": "string",
+              "description": "Date these observations were last checked against the live checkout. A consumer MAY decline to repeat stale figures."
+            }
+          }
+        },
+        "agent_payment": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Optional. Whether an agent may complete a payment at this destination without a human, and by what protocol. As of this version the truthful value for every surveyed platform is that it may not, which is precisely why the field is worth publishing: an explicit no is actionable, where silence leaves an agent to discover the same answer by attempting it.",
+          "additionalProperties": false,
+          "required": [
+            "agent_may_complete_payment",
+            "verified_at"
+          ],
+          "properties": {
+            "agent_may_complete_payment": {
+              "type": "boolean",
+              "description": "MUST be false unless supported_protocols is non-empty. An agent MUST NOT attempt to complete a payment where this is false, and MUST NOT represent a gift as made until the donor confirms it."
+            },
+            "supported_protocols": {
+              "type": "array",
+              "description": "Agentic payment protocols the destination accepts. An empty array asserts none. Names are recorded rather than interpreted: VGP does not implement any of these and takes no position on them.",
+              "items": {
+                "enum": [
+                  "ap2",
+                  "acp",
+                  "x402",
+                  "mpp",
+                  "other"
+                ]
+              }
+            },
+            "checkout_session_endpoint": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "An endpoint that takes an amount, currency, frequency and designation and returns an approval URL or client token. Not a charge, and it never receives a card number. Null where the destination offers none."
+            },
+            "idempotency": {
+              "enum": [
+                "required",
+                "supported",
+                "unsupported"
+              ],
+              "description": "Whether the destination accepts an idempotency key. Agents retry, and a dropped response on a donation charges someone twice."
+            },
+            "completion_signal": {
+              "enum": [
+                "webhook",
+                "redirect",
+                "poll",
+                "none"
+              ],
+              "description": "How an agent may learn the gift completed. Where this is none, an agent that hands over a URL has no way to know what happened and MUST say so rather than assume success."
+            },
+            "handoff": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "The organization's own instruction to an agent that has gone as far as it may. Untrusted display text under section 5."
+            },
+            "verified_at": {
+              "type": "string",
+              "description": "Date these capabilities were last checked."
+            }
+          }
         }
       }
     },

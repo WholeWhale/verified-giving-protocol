@@ -188,6 +188,72 @@ An amount is not an amount without a currency. `currency` is required on any des
 
 Prefilling does not make the tool transactional. `giving_prepare` still returns a URL, and the donor still authorizes the payment.
 
+### 4.5 `checkout_observed`
+
+A destination MAY declare what its checkout does to the donor's number between the amount an agent sends and the amount the organization receives.
+
+```json
+"checkout_observed": {
+  "amount_parameter_means": "gift_to_organization",
+  "adds_at_checkout": [
+    { "kind": "platform_tip", "recipient": "Givebutter",
+      "preselected": true, "default_percent": 15, "donor_can_decline": true }
+  ],
+  "organization_receives": "full_gift",
+  "verified_at": "2026-09-04"
+}
+```
+
+The field exists because `prefill.amount` does not mean what an agent reasonably takes it to mean. On the platforms surveyed, a checkout reached with `amount=100` pre-selects a platform tip and, separately, a contribution toward processing — both defaulted on, neither reachable by any URL parameter. The donor is charged materially more than the number the agent chose, and no parameter the agent controls changes that.
+
+A human donor sees the tip control and can decline it. An agent that hands over a prefilled URL and reports *"a $100 donation"* has stated a figure that is not the figure, and has no way to discover this: the additions appear after the step the URL lands on, and at least one surveyed checkout displays no combined total at all. This is the §4.4 failure mode — the donor believes they set something they did not — relocated from the recurrence to the amount, where it is worse, because it is the number the donor is actually charged.
+
+**This field is a description, never a control.** No value written here changes what the platform does. Writing `default_percent: 0` where the checkout defaults to fifteen does not zero the tip; it converts a disclosed cost into a concealed one, which is the only outcome worse than the cost itself.
+
+It is also the first field in this document whose subject is not the organization. `recipient`, `restrictions`, and `designations` are facts the organization owns and has standing to declare. A platform's tip default is a fact about the platform, which the organization observes and may not control — the same standing `prefill.url_template` has, and it carries `verified_at` on the same terms for the same reason.
+
+Normative rules for a consumer:
+
+1. Where `adds_at_checkout` contains any entry with `preselected: true`, a consumer that states a donation amount MUST also state that the charge will be higher by default. Reporting the amount alone is a misstatement.
+2. A consumer MUST NOT present any value here as a setting it can change, and MUST NOT send any of these names as a URL parameter. Only `prefill.parameters` may be filled.
+3. Where `donor_disclosure` is present, a consumer SHOULD repeat it rather than compose its own summary. Composing one from the structured fields is inference, and §4.4 already establishes who may declare a platform's behaviour.
+4. Where `designations_honored` is `false`, a consumer MUST NOT present a designation as binding, whatever `designation_support` says. One describes a field at checkout; the other describes whether selecting it has any effect.
+5. `organization_receives` MUST be `unknown` rather than estimated. An overstated figure is the harmful direction, and a declaration is not the place to guess.
+6. As with `prefill`, a consumer MAY decline to repeat figures it considers stale.
+
+Absent this field, a consumer knows nothing about the checkout's additions and MUST NOT infer their absence. A missing declaration is not a declaration of zero.
+
+### 4.6 `agent_payment`
+
+A destination MAY declare whether an agent may complete a payment without a human, and by what protocol.
+
+```json
+"agent_payment": {
+  "agent_may_complete_payment": false,
+  "supported_protocols": [],
+  "checkout_session_endpoint": null,
+  "idempotency": "unsupported",
+  "completion_signal": "none",
+  "verified_at": "2026-09-04"
+}
+```
+
+At the time of writing, the truthful value of `agent_may_complete_payment` on every platform surveyed is `false`. No donation platform read for this specification exposes an endpoint that opens a checkout an agent did not already control; the donate link is a URL a person visits, and the platforms are explicit that no server-side charge exists. The field is worth publishing anyway, and the emptiness is the reason. **An explicit `false` is actionable where silence is not:** it tells an agent to hand off deliberately, rather than to discover the same answer by attempting a payment and failing somewhere the donor can see.
+
+The fields correspond to what this project has asked donation platforms for publicly. That correspondence is deliberate — a request with nowhere to record the answer is a request nobody can be held to, and a declaration slot that fills in as platforms ship is how the ask stops being rhetorical.
+
+`agent_may_complete_payment` is the gate, and the others describe how far short of it a destination falls. `completion_signal` is the one that most changes an agent's behaviour: where it is `none`, an agent that has handed over a URL has no way to learn what happened, and saying nothing is not the same as saying it does not know.
+
+Normative rules for a consumer:
+
+1. `agent_may_complete_payment` MUST be `false` where `supported_protocols` is empty. A document asserting otherwise is invalid, and a consumer MUST refuse it rather than resolve the contradiction in the permissive direction.
+2. Where `agent_may_complete_payment` is `false`, a consumer MUST NOT attempt a payment and MUST NOT represent a gift as made. It prepares a URL, hands it over, and says plainly that it cannot confirm the outcome.
+3. Where `completion_signal` is `none`, a consumer MUST NOT infer success from the absence of an error. Nothing reports failure either.
+4. A consumer MUST NOT treat a listed protocol as an instruction to install or trust it. VGP records what a destination accepts; it implements no payment protocol and endorses none.
+5. Absent this field, a consumer MUST assume `agent_may_complete_payment` is `false`. This is the one default in this specification that is deliberately the restrictive one: every other absent field means *undeclared*, and this one means *no*.
+
+Rule 5 is a departure and is meant to be. Elsewhere a missing field means the organization has not said, and §3.3 forbids reading absence as a finding. Payment is the exception, because the cost of the two errors is not symmetric: an agent that wrongly declines to pay wastes a step, and an agent that wrongly believes it may pay moves someone else's money.
+
 ## 5. Consumer conformance
 
 A conforming consumer:
