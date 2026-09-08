@@ -184,6 +184,12 @@ Normative rules for a consumer:
 5. `verified_at` records when the template was last checked against the live platform. A consumer MAY decline to use a stale template.
 6. Where a parameter declares `min` or `max`, a consumer MUST omit the parameter entirely rather than send a value outside them. Platforms commonly ignore an out-of-range value in silence, which leaves the donor on a default the agent did not choose and believes it did not accept. Handing over an unprefilled URL is the honest outcome.
 
+7. A consumer MUST NOT lock a value the donor could otherwise change. Where `donor_can_change` is `false`, a consumer MUST say so before handing over the URL.
+
+Rule 7 exists because at least one platform accepts a lock alongside the value. Fundraise Up takes `modifyAmount=no` and `modifyDesignation=no`, and a template carrying either hands the donor a figure they cannot correct. That is a reasonable thing for an organization to do on its own donation page and a bad thing for an agent to do on a donor's behalf, because the agent chose the number. An agent that both picks the amount and removes the correction has closed the only loop the donor had left.
+
+The default is the permissive one here, which is the opposite of §4.6. An absent `donor_can_change` means the donor can change the value, because a consumer that wrongly believes a field is editable understates its own power and a consumer that wrongly believes it is locked warns about a restriction that does not exist. Neither is good, and the first is the smaller harm.
+
 An amount is not an amount without a currency. `currency` is required on any destination with an online method, and a consumer MUST NOT infer one from `organization.country`: a US organization may perfectly well collect in CAD.
 
 Prefilling does not make the tool transactional. `giving_prepare` still returns a URL, and the donor still authorizes the payment.

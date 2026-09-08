@@ -362,6 +362,11 @@
                   "max": {
                     "type": "number",
                     "description": "Optional. Largest value the platform will accept. A consumer MUST omit the parameter rather than send a value outside these bounds, because a platform that silently ignores an out-of-range value leaves the donor on a default the agent never chose."
+                  },
+                  "donor_can_change": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Whether the donor may still change this value after the template has set it. Some platforms accept a lock alongside the value, so a prefilled amount can arrive fixed. Absent, it is true. A consumer MUST NOT introduce a lock the declaration does not carry, and where this is false it MUST tell the donor the value is fixed before handing over the URL."
                   }
                 }
               }
