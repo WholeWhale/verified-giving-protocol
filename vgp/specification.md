@@ -156,6 +156,10 @@ Publish only designations the organization confirms it currently accepts. IDs ar
 
 `designation_support` describes **donor choice**, not earmarking. It is `true` only where the donor is offered a designation at checkout. A destination whose gifts are all directed to one program by the organization sets it `false` and states the earmarking in `restrictions`: the donor selects nothing, so a consumer that offered them a choice would be inventing one. The two are easy to conflate and mean different things to an agent — one is a field it may fill, the other is a fact it should repeat.
 
+`designation_required` is a different question, and the two come apart in practice. One asks whether the donor picks a fund; the other asks whether a gift can be made without one at all. A destination may require a designation and offer the donor no choice of it, because the organization sets it. Fundraise Up's create-donation endpoint requires a designation on every gift, so on that platform an unrestricted gift does not exist as a shape the API will accept, whatever the organization would prefer.
+
+Absent, `designation_required` is `false`. A consumer that wrongly believes a designation is required will either put a question to the donor that has no answer or invent a fund to fill the field, and inventing a fund is precisely what §4.3 exists to prevent. A consumer that wrongly believes one is not required sends a gift the platform refuses, with an error the agent can read and report. The second failure is visible and recoverable; the first is neither.
+
 ### 4.4 Prefill
 
 A destination MAY declare how to reach it with fields already filled:

@@ -280,7 +280,13 @@
           "type": "boolean"
         },
         "designation_support": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Whether the donor is offered a choice of designation at checkout. This is about donor choice, not about earmarking."
+        },
+        "designation_required": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether a gift through this destination must carry a designation at all. Separate from designation_support, which is only about whether the donor picks it. A destination may require one and offer no choice, where the organization sets it; Fundraise Up's create-donation endpoint requires a designation on every gift. Absent, it is false: a consumer that wrongly believes one is required will either ask the donor a question with no answer or invent a fund, and inventing a fund is the thing section 4.3 exists to prevent."
         },
         "restrictions": {
           "type": [
