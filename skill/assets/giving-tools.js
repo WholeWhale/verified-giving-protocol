@@ -19,8 +19,8 @@
   // agent already on a donation page a speculative request for a path that usually
   // does not exist. It is a hint, never an authority: section 2 makes the publishing
   // domain the authority and requires canonical_domain to match the host that served
-  // the document, so a cross-origin href is refused rather than followed. Honouring
-  // one would let any page nominate another organisation's declaration as its own,
+  // the document, so a cross-origin href is refused rather than followed. Honoring
+  // one would let any page nominate another organization's declaration as its own,
   // which is the shadow donation page problem inverted.
   function declarationUrl() {
     const link = document.querySelector('link[rel="giving"]');

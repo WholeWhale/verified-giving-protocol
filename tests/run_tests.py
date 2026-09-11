@@ -329,7 +329,7 @@ def test_approval_gate() -> None:
         # be read from. That file is a real declaration: its EIN was confirmed
         # against the IRS Business Master File on 2026-08-28 and it is now approved,
         # so reading the invariant off it made the test assert a fact about one
-        # organisation's paperwork rather than about the protocol.
+        # organization's paperwork rather than about the protocol.
         vgp_noein = tmp / "no-ein.json"
         doc_noein = load(draft_template)
         doc_noein["organization"]["ein"] = None

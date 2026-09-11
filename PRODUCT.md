@@ -117,7 +117,7 @@ infrastructure that can be trusted** — explicitly not as AI-generated marketin
 Named as the reference family: securitytxt.org (a policy-file standard with a hosted form
 generator), jsonschema.org, letsencrypt.org, sqlite.org, curl.se, and the IETF
 datatracker. The closest structural analog is **ads.txt**: a root file in which a domain
-owner declares who is authorised to act on their behalf, published to defeat unauthorised
+owner declares who is authorized to act on their behalf, published to defeat unauthorized
 intermediaries. That is VGP's problem with donations substituted for ad inventory.
 
 Named as prohibited: gradient meshes, glassmorphism, floating rounded cards over heroes,

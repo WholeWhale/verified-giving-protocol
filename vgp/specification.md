@@ -22,9 +22,9 @@ The publishing domain **is** the authority. VGP asserts nothing about a document
 
 The document root is deliberate, and the alternative was `/.well-known/`. Two kinds of file live at a site's root. One describes how to speak a protocol with the server, and belongs under `/.well-known/` — `openid-configuration`, `acme-challenge`. The other is a **policy the owner publishes about what third parties may do**, and has always lived at the root: `robots.txt`, `sitemap.xml`, `ads.txt`.
 
-VGP is the second kind. The nearest analogue is `ads.txt`, in which a domain owner declares who is authorised to sell their inventory, published specifically to defeat unauthorised intermediaries trading on their name. Substitute donations for ad inventory and it is this specification's problem. A useful test: when the file is absent, `/.well-known/openid-configuration` means *this server does not speak that protocol*, while `robots.txt`, `ads.txt` and `giving.json` mean *the owner has declared nothing* — a statement about the owner, not the server. Section 3.4 depends on that reading.
+VGP is the second kind. The nearest analogue is `ads.txt`, in which a domain owner declares who is authorized to sell their inventory, published specifically to defeat unauthorized intermediaries trading on their name. Substitute donations for ad inventory and it is this specification's problem. A useful test: when the file is absent, `/.well-known/openid-configuration` means *this server does not speak that protocol*, while `robots.txt`, `ads.txt` and `giving.json` mean *the owner has declared nothing* — a statement about the owner, not the server. Section 3.4 depends on that reading.
 
-The root also keeps the file legible to people. A programme officer, a journalist, or a board member can open `example.org/giving.json` and read who is authorised, the same way anyone can read a publisher's `ads.txt`. A declaration nobody but an agent can find is harder to hold an organization to.
+The root also keeps the file legible to people. A program officer, a journalist, or a board member can open `example.org/giving.json` and read who is authorized, the same way anyone can read a publisher's `ads.txt`. A declaration nobody but an agent can find is harder to hold an organization to.
 
 ### 2.1 Advertising the declaration
 
@@ -154,7 +154,7 @@ When `organization_approved` is `true`, `legal_name`, `display_name`, and `count
 
 Publish only designations the organization confirms it currently accepts. IDs are stable and separate from labels. Navigation labels scraped from a website are not funds.
 
-`designation_support` describes **donor choice**, not earmarking. It is `true` only where the donor is offered a designation at checkout. A destination whose gifts are all directed to one programme by the organization sets it `false` and states the earmarking in `restrictions`: the donor selects nothing, so a consumer that offered them a choice would be inventing one. The two are easy to conflate and mean different things to an agent — one is a field it may fill, the other is a fact it should repeat.
+`designation_support` describes **donor choice**, not earmarking. It is `true` only where the donor is offered a designation at checkout. A destination whose gifts are all directed to one program by the organization sets it `false` and states the earmarking in `restrictions`: the donor selects nothing, so a consumer that offered them a choice would be inventing one. The two are easy to conflate and mean different things to an agent — one is a field it may fill, the other is a fact it should repeat.
 
 ### 4.4 Prefill
 

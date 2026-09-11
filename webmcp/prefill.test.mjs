@@ -1,4 +1,4 @@
-// Behaviour of the declared-prefill builder in giving-tools.js.
+// Behavior of the declared-prefill builder in giving-tools.js.
 //
 // The builder decides what an agent may put in front of a donor, so its
 // refusals matter more than its successes. Each test below is a refusal the

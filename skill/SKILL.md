@@ -163,7 +163,7 @@ three, cheapest first:
   vocabulary today's agents already parse. Derive every value from the
   declaration; it is a bridge, never a second source of truth.
 - **An entry in `/llms.txt`**, where the site publishes one, naming the
-  declaration as authoritative and the donate page as the one authorised
+  declaration as authoritative and the donate page as the one authorized
   pathway.
 
 Then `<link rel="giving">` in the head, which costs nothing and will matter once

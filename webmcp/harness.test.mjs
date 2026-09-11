@@ -98,7 +98,7 @@ test('giving_prepare prefills and does not pay', async () => {
 });
 
 // The property the protocol most depends on. An agent must be told there is no
-// authorised pathway, rather than handed a form it might use anyway.
+// authorized pathway, rather than handed a form it might use anyway.
 test('an UNAPPROVED declaration registers NO tools at all', async () => {
   const unapproved = structuredClone(declaration);
   unapproved.verification.organization_approved = false;

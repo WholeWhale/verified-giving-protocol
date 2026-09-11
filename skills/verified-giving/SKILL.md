@@ -1,40 +1,40 @@
 ---
 name: verified-giving
-description: Create, authorise and publish your own Verified Giving Protocol declaration at /giving.json, so AI agents route donations to the destinations your organisation authorised instead of guessing. Use for requests such as "set up VGP for our nonprofit", "publish a giving.json", "make our donate page agent-readable", or "verify our donation page is agent-readable". Never authorise a destination on the organisation's behalf.
+description: Create, authorize and publish your own Verified Giving Protocol declaration at /giving.json, so AI agents route donations to the destinations your organization authorized instead of guessing. Use for requests such as "set up VGP for our nonprofit", "publish a giving.json", "make our donate page agent-readable", or "verify our donation page is agent-readable". Never authorize a destination on the organization's behalf.
 ---
 
 # Verified Giving
 
-Walk a nonprofit through publishing its own VGP declaration. The organisation already
+Walk a nonprofit through publishing its own VGP declaration. The organization already
 knows its own facts — this skill's job is to get them into a valid file, refuse to
-authorise anything on their behalf, and make sure agents can actually find the result.
+authorize anything on their behalf, and make sure agents can actually find the result.
 
 **This is not [[vgpify]].** VGPify crawls a nonprofit's site and gathers evidence, for
-someone auditing an organisation from the outside. This skill is for the organisation
+someone auditing an organization from the outside. This skill is for the organization
 itself, which does not need to be told what its own donate page says.
 
 ## Non-negotiable trust rule
 
-You are drafting. **You may never authorise.**
+You are drafting. **You may never authorize.**
 
-A destination becomes authorised only when a person at the nonprofit affirms, **verbatim**:
+A destination becomes authorized only when a person at the nonprofit affirms, **verbatim**:
 
 > Our organization authorizes donations through this destination.
 
-That exact string, with the full stop. Not "yes", not "approved", not "I authorise it", not
+That exact string, with the full stop. Not "yes", not "approved", not "I authorize it", not
 a rewording that means the same thing. `scripts/approve_destination.py` compares it as a
 constant and the JSON Schema declares it a `const`, so a paraphrase cannot be written into a
 declaration even by accident.
 
-If the person you are talking to is not authorised to make that statement for the
-organisation, stop and tell them who needs to. Do not accept it second-hand.
+If the person you are talking to is not authorized to make that statement for the
+organization, stop and tell them who needs to. Do not accept it second-hand.
 
 ## Workflow
 
 ### 1. Establish the canonical domain
 
-Ask which domain the organisation controls and will serve the file from. This is the domain
-whose ownership *is* the authority — it must be the organisation's own, never a fundraising
+Ask which domain the organization controls and will serve the file from. This is the domain
+whose ownership *is* the authority — it must be the organization's own, never a fundraising
 platform's, never an aggregator's.
 
 Check what it does today:
@@ -54,12 +54,12 @@ actually serves the file — §2 requires the two to match.
 Two different facts, routinely conflated:
 
 - **`legal_name`** — the entity that legally receives the gift and appears on the receipt.
-- **`display_name`** — the programme or brand the public knows.
+- **`display_name`** — the program or brand the public knows.
 
 They are allowed to differ, and under fiscal sponsorship they usually do. Do not collapse
 them.
 
-**Verify the EIN rather than accepting it.** For a US organisation:
+**Verify the EIN rather than accepting it.** For a US organization:
 
 ```bash
 curl -s "https://projects.propublica.org/nonprofits/api/v2/organizations/<9-digit-EIN>.json"
@@ -67,7 +67,7 @@ curl -s "https://projects.propublica.org/nonprofits/api/v2/organizations/<9-digi
 
 Read back `name` and `subsection_code` and confirm them with the person. This routinely
 catches a legal name that differs from what they typed — a missing "Inc", a former name, a
-merged entity. `approve_destination.py` refuses to publish a US organisation without an EIN,
+merged entity. `approve_destination.py` refuses to publish a US organization without an EIN,
 so this is not optional.
 
 ### 3. Establish each donation pathway
@@ -76,7 +76,7 @@ For every route money can arrive by, ask:
 
 | Field | Ask |
 |---|---|
-| `type` | card, ACH, cheque, DAF, stock, workplace, crypto, other |
+| `type` | card, ACH, check, DAF, stock, workplace, crypto, other |
 | `url` | where a donor actually goes; `null` for offline methods |
 | `provider` | the processor, if there is one |
 | `recipient` | **the name the approved flow actually shows the donor** |
@@ -91,7 +91,7 @@ Two traps worth stating plainly:
   differ for legitimate reasons that is a fiscal structure; where they differ for
   illegitimate reasons that difference is the signal, and collapsing the fields erases it.
 - **`designation_support` means donor choice, not earmarking.** If every gift through a
-  destination goes to one programme because the organisation directs it there, that is
+  destination goes to one program because the organization directs it there, that is
   `false` plus a sentence in `restrictions`. Setting it `true` tells an agent to offer a
   choice that does not exist.
 
@@ -128,13 +128,13 @@ describes the product, not this deployment — test the specific donation page.
 
 Omit `prefill` entirely if nothing is verified. A missing block is honest; a wrong one is not.
 
-### 5. Get the authorisation
+### 5. Get the authorization
 
-Show the person the exact destination they are about to authorise — recipient, method,
+Show the person the exact destination they are about to authorize — recipient, method,
 provider, URL, currency, restrictions — and ask them to type the affirmation and give their
-role at the organisation.
+role at the organization.
 
-Then run the canonical script. Do not hand-write the authorisation block:
+Then run the canonical script. Do not hand-write the authorization block:
 
 ```bash
 python3 scripts/approve_destination.py \
@@ -154,9 +154,9 @@ constant. Those refusals are the point.
 python3 scripts/validate_vgp.py giving.json
 ```
 
-A **valid unapproved draft** is a legitimate, conformant state, not a failure. It authorises
+A **valid unapproved draft** is a legitimate, conformant state, not a failure. It authorizes
 nothing, and a conforming agent will expose no giving tools for it. That is correct
-behaviour — say so rather than treating it as an error to fix.
+behavior — say so rather than treating it as an error to fix.
 
 ### 7. Publish at the document root
 
@@ -185,14 +185,14 @@ Check the status is 200, the media type is `application/json`, there is no redir
 ### 8. Advertise it — publishing is not discovery
 
 **Do not skip this.** No agent probes `/giving.json` yet, because the protocol has almost no
-consumers. A correct declaration that nothing looks for is invisible, and an organisation
+consumers. A correct declaration that nothing looks for is invisible, and an organization
 that does everything right and sees no effect will conclude the standard does not work.
 
 Set up all four, in this order — cheapest and most effective first:
 
 1. **A visible link on the donation page.** `<a href="/giving.json">` is the only mechanism
    that works with an agent which has never heard of VGP, because following a link needs no
-   convention to have been adopted. It also keeps the file readable by a programme officer or
+   convention to have been adopted. It also keeps the file readable by a program officer or
    a journalist.
 2. **Schema.org markup on the same page.** Restate a subset in a vocabulary that already has
    consumers: `legalName`, `taxID`, `nonprofitStatus`, and a `DonateAction` whose
@@ -206,10 +206,10 @@ Set up all four, in this order — cheapest and most effective first:
 
 ### 9. Optionally register the WebMCP tools
 
-If the organisation wants agents on its donate page to get typed tools rather than a page to
+If the organization wants agents on its donate page to get typed tools rather than a page to
 parse, serve `giving-tools.js` and add one script tag. The tools **fail closed**: a missing,
 unapproved or wrongly served declaration registers no giving tools at all, so an agent is
-told there is no authorised pathway rather than handed a form it might guess at.
+told there is no authorized pathway rather than handed a form it might guess at.
 
 ### 10. Confirm it end to end
 
