@@ -226,7 +226,7 @@ Normative rules for a consumer:
 
 1. Where `adds_at_checkout` contains any entry with `preselected: true`, a consumer that states a donation amount MUST also state that the charge will be higher by default. Reporting the amount alone is a misstatement.
 2. A consumer MUST NOT present any value here as a setting it can change, and MUST NOT send any of these names as a URL parameter. Only `prefill.parameters` may be filled.
-3. Where `donor_disclosure` is present, a consumer SHOULD repeat it rather than compose its own summary. Composing one from the structured fields is inference, and §4.4 already establishes who may declare a platform's behaviour.
+3. Where `donor_disclosure` is present, a consumer SHOULD repeat it rather than compose its own summary. Composing one from the structured fields is inference, and §4.4 already establishes who may declare a platform's behavior.
 4. Where `designations_honored` is `false`, a consumer MUST NOT present a designation as binding, whatever `designation_support` says. One describes a field at checkout; the other describes whether selecting it has any effect.
 5. `organization_receives` MUST be `unknown` rather than estimated. An overstated figure is the harmful direction, and a declaration is not the place to guess.
 6. As with `prefill`, a consumer MAY decline to repeat figures it considers stale.
@@ -252,7 +252,7 @@ At the time of writing, the truthful value of `agent_may_complete_payment` on ev
 
 The fields correspond to what this project has asked donation platforms for publicly. That correspondence is deliberate — a request with nowhere to record the answer is a request nobody can be held to, and a declaration slot that fills in as platforms ship is how the ask stops being rhetorical.
 
-`agent_may_complete_payment` is the gate, and the others describe how far short of it a destination falls. `completion_signal` is the one that most changes an agent's behaviour: where it is `none`, an agent that has handed over a URL has no way to learn what happened, and saying nothing is not the same as saying it does not know.
+`agent_may_complete_payment` is the gate, and the others describe how far short of it a destination falls. `completion_signal` is the one that most changes an agent's behavior: where it is `none`, an agent that has handed over a URL has no way to learn what happened, and saying nothing is not the same as saying it does not know.
 
 Normative rules for a consumer:
 

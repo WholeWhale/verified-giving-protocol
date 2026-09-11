@@ -388,7 +388,7 @@
             "object",
             "null"
           ],
-          "description": "Optional. What the checkout does to the donor's number between the amount an agent sends and the amount the organization receives. The subject here is a third-party platform's behaviour, which the organization observes but does not control, so this object carries verified_at on the same terms as prefill. A consumer MUST treat these values as a disclosure to repeat, never as a setting: no value written here changes what the platform does.",
+          "description": "Optional. What the checkout does to the donor's number between the amount an agent sends and the amount the organization receives. The subject here is a third-party platform's behavior, which the organization observes but does not control, so this object carries verified_at on the same terms as prefill. A consumer MUST treat these values as a disclosure to repeat, never as a setting: no value written here changes what the platform does.",
           "additionalProperties": false,
           "required": [
             "amount_parameter_means",
