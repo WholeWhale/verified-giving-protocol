@@ -61,6 +61,8 @@ def main() -> int:
         parser.error("US organization EIN is unresolved; do not approve the VGP yet")
 
     now = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    # The schema requires these, so they are written even where the candidate left one
+    # unresolved. A null the validator rejects is better than a key that vanishes.
     destination = {
         key: candidate.get(key)
         for key in (
@@ -80,6 +82,22 @@ def main() -> int:
         "approved_at": now,
         "statement": REQUIRED_STATEMENT,
     }
+    # Optional keys are carried only where the candidate declares one. Approval changes
+    # a destination's status, not its facts: dropping the fee disclosure a reviewer
+    # established would publish a declaration quieter than the review it came from, and
+    # nothing downstream would report the loss, because every one of these is optional
+    # and the result still validates. Copying an absent key is the opposite error --
+    # writing checkout_observed.donee_of_record as null asserts the organization is the
+    # donee of record, which is a claim, not a blank.
+    for key in (
+        "currency",
+        "designation_required",
+        "prefill",
+        "checkout_observed",
+        "agent_payment",
+    ):
+        if key in candidate:
+            destination[key] = candidate[key]
 
     giving = vgp.setdefault("giving", {})
     destinations = giving.setdefault("authorized_destinations", [])

@@ -379,6 +379,66 @@ def test_approval_gate() -> None:
                 approve(vgp_ok, STATEMENT).returncode != 0,
             )
 
+        # Optional fields must survive promotion. The destination used to be built
+        # from an eight-key whitelist, so a reviewer who had established a currency
+        # and a fee disclosure watched both disappear at approval -- with no error,
+        # because each of them is optional and the shortened document still
+        # validates. Approval changes a destination's status, not its facts.
+        review_rich = tmp / "review-rich.json"
+        doc_review = load(review_template)
+        candidate = doc_review["candidates"][0]
+        candidate["currency"] = "USD"
+        candidate["checkout_observed"] = {
+            "amount_parameter_means": "no_amount_parameter",
+            "organization_receives": "unknown",
+            "verified_at": "2026-09-15",
+        }
+        candidate["agent_payment"] = {
+            "agent_may_complete_payment": False,
+            "supported_protocols": [],
+            "verified_at": "2026-09-15",
+        }
+        review_rich.write_text(json.dumps(doc_review, indent=2), encoding="utf-8")
+
+        vgp_rich = tmp / "rich.json"
+        shutil.copyfile(draft_template, vgp_rich)
+        rich = run(
+            str(SCRIPTS / "approve_destination.py"),
+            "--review", str(review_rich),
+            "--vgp", str(vgp_rich),
+            "--candidate-id", candidate["id"],
+            "--approver-role", "Executive Director",
+            "--statement", STATEMENT,
+        )
+        check(
+            "a candidate carrying optional fields authorizes",
+            rich.returncode == 0,
+            rich.stderr.strip(),
+        )
+        if rich.returncode == 0:
+            promoted = load(vgp_rich)["giving"]["authorized_destinations"][0]
+            check("currency survives promotion", promoted.get("currency") == "USD")
+            check(
+                "checkout_observed survives promotion",
+                promoted.get("checkout_observed", {}).get("amount_parameter_means")
+                == "no_amount_parameter",
+                "a fee disclosure dropped at approval is a disclosure nobody made",
+            )
+            check(
+                "agent_payment survives promotion",
+                "agent_payment" in promoted,
+            )
+            check(
+                "an optional key the candidate omitted is not invented",
+                "prefill" not in promoted,
+                "writing an absent key as null asserts a default nobody verified",
+            )
+            check(
+                "the promoted document validates",
+                validate(vgp_rich).returncode == 0,
+                validate(vgp_rich).stderr.strip(),
+            )
+
 
 # --------------------------------------------------------------------------
 # 5. Everything compiles / parses
