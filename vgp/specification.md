@@ -222,6 +222,8 @@ A human donor sees the tip control and can decline it. An agent that hands over 
 
 It is also the first field in this document whose subject is not the organization. `recipient`, `restrictions`, and `designations` are facts the organization owns and has standing to declare. A platform's tip default is a fact about the platform, which the organization observes and may not control — the same standing `prefill.url_template` has, and it carries `verified_at` on the same terms for the same reason.
 
+**Most checkouts carry no amount at all**, and `amount_parameter_means` has a third value for them. `no_amount_parameter` declares a checkout that accepts no amount, currency or frequency in its URL — a third-party widget keyed only on an organization identifier is the ordinary case, not the exception. The value exists because the field is required, and a required field with no truthful value is a field an organization omits along with everything standing beside it. A destination that cannot carry an amount still has fees to disclose, and those disclosures are the reason this object exists.
+
 Normative rules for a consumer:
 
 1. Where `adds_at_checkout` contains any entry with `preselected: true`, a consumer that states a donation amount MUST also state that the charge will be higher by default. Reporting the amount alone is a misstatement.
@@ -230,6 +232,7 @@ Normative rules for a consumer:
 4. Where `designations_honored` is `false`, a consumer MUST NOT present a designation as binding, whatever `designation_support` says. One describes a field at checkout; the other describes whether selecting it has any effect.
 5. `organization_receives` MUST be `unknown` rather than estimated. An overstated figure is the harmful direction, and a declaration is not the place to guess.
 6. As with `prefill`, a consumer MAY decline to repeat figures it considers stale.
+7. Where `amount_parameter_means` is `no_amount_parameter`, a consumer MUST NOT state an amount as though the checkout will carry it. The donor types the amount, and a consumer that says otherwise has described a page that does not exist. Telling the donor what to enter is the correct behavior; reporting it as already set is not.
 
 Absent this field, a consumer knows nothing about the checkout's additions and MUST NOT infer their absence. A missing declaration is not a declaration of zero.
 
@@ -248,7 +251,7 @@ A destination MAY declare whether an agent may complete a payment without a huma
 }
 ```
 
-At the time of writing, the truthful value of `agent_may_complete_payment` on every platform surveyed is `false`. No donation platform read for this specification exposes an endpoint that opens a checkout an agent did not already control; the donate link is a URL a person visits, and the platforms are explicit that no server-side charge exists. The field is worth publishing anyway, and the emptiness is the reason. **An explicit `false` is actionable where silence is not:** it tells an agent to hand off deliberately, rather than to discover the same answer by attempting a payment and failing somewhere the donor can see.
+At the time of writing, the truthful value of `agent_may_complete_payment` on every platform surveyed is `false`. One platform, The Giving Block, exposes an endpoint that mints a hosted donation URL, and that is worth separating from payment carefully: creating the URL charges nobody, and the donor still completes the payment in their own browser. It is credentialed and issued per organization, so the organization holding the credential may call it and a third party may not. Everywhere else the donate link remains a URL a person visits, and the platforms are explicit that no server-side charge exists. The field is worth publishing anyway, and the near-emptiness is the reason. **An explicit `false` is actionable where silence is not:** it tells an agent to hand off deliberately, rather than to discover the same answer by attempting a payment and failing somewhere the donor can see.
 
 The fields correspond to what this project has asked donation platforms for publicly. That correspondence is deliberate — a request with nowhere to record the answer is a request nobody can be held to, and a declaration slot that fills in as platforms ship is how the ask stops being rhetorical.
 

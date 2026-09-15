@@ -399,9 +399,10 @@
             "amount_parameter_means": {
               "enum": [
                 "gift_to_organization",
-                "total_charged_to_donor"
+                "total_charged_to_donor",
+                "no_amount_parameter"
               ],
-              "description": "What the amount an agent sends actually denotes. Where it is gift_to_organization, everything in adds_at_checkout is charged on top, and the donor's total is higher than the number the agent chose."
+              "description": "What the amount an agent sends actually denotes. Where it is gift_to_organization, everything in adds_at_checkout is charged on top, and the donor's total is higher than the number the agent chose. Where it is no_amount_parameter, the checkout carries no amount at all and the donor enters it: this is the common case, and it is declared rather than left absent so that the rest of this object remains available to a destination whose checkout ignores every parameter."
             },
             "donee_of_record": {
               "type": [
