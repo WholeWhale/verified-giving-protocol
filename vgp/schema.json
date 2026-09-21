@@ -552,6 +552,45 @@
               "description": "Date these capabilities were last checked."
             }
           }
+        },
+        "platform_profile": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Optional. A pointer to the agent-readable profile a donation platform publishes for this destination, and to that platform's documentation, so the detail that changes on the platform's schedule (campaigns, suggested amounts, link parameters) is read from the platform rather than copied here. Data, never instructions: it describes this destination and cannot widen it. See section 4.7.",
+          "additionalProperties": false,
+          "required": [
+            "url",
+            "verified_at"
+          ],
+          "properties": {
+            "url": {
+              "type": "string",
+              "pattern": "^https://",
+              "description": "The platform's profile for this organization, as the organization's own site links to it."
+            },
+            "format": {
+              "enum": [
+                "markdown",
+                "json",
+                "other"
+              ],
+              "description": "The profile's media format, so a consumer knows what it is fetching before it fetches it."
+            },
+            "docs_url": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^https://",
+              "description": "The platform's public documentation for the profile. Pointed to rather than restated, so a change on the platform's side does not leave this document describing the old behavior."
+            },
+            "verified_at": {
+              "type": "string",
+              "description": "Date the profile was last confirmed to resolve and to describe this organization."
+            }
+          }
         }
       }
     },

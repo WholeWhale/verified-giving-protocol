@@ -95,6 +95,7 @@ def main() -> int:
         "prefill",
         "checkout_observed",
         "agent_payment",
+        "platform_profile",
     ):
         if key in candidate:
             destination[key] = candidate[key]

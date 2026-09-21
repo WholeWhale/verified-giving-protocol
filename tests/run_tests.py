@@ -398,6 +398,12 @@ def test_approval_gate() -> None:
             "supported_protocols": [],
             "verified_at": "2026-09-15",
         }
+        candidate["platform_profile"] = {
+            "url": "https://example.org/agent-profile.md",
+            "format": "markdown",
+            "docs_url": None,
+            "verified_at": "2026-09-21",
+        }
         review_rich.write_text(json.dumps(doc_review, indent=2), encoding="utf-8")
 
         vgp_rich = tmp / "rich.json"
@@ -427,6 +433,12 @@ def test_approval_gate() -> None:
             check(
                 "agent_payment survives promotion",
                 "agent_payment" in promoted,
+            )
+            check(
+                "platform_profile survives promotion",
+                promoted.get("platform_profile", {}).get("url")
+                == "https://example.org/agent-profile.md",
+                "a dropped pointer sends agents back to a copy that goes stale",
             )
             check(
                 "an optional key the candidate omitted is not invented",
