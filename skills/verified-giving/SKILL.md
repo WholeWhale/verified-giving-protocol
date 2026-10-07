@@ -200,8 +200,16 @@ Set up all four, in this order — cheapest and most effective first:
    `EntryPoint.urlTemplate` carries the same prefill contract. Derive every value from the
    declaration and say in a comment that the declaration wins — this is a bridge, never a
    second source of truth.
-3. **An `/llms.txt` entry**, if the site publishes one, naming the declaration as
-   authoritative and this file as possibly stale.
+3. **An `/llms.txt` that points to `/giving.json`.** Publish one if the site has none: it is a
+   plain-text file at the root, and a growing number of agents read it before anything else
+   on a site. Give it a Giving section that links the declaration by its full URL, names it
+   as the authority, and says `llms.txt` itself may be stale and loses any disagreement:
+
+   ```markdown
+   ## Giving
+
+   - [Verified Giving Protocol declaration](https://example.org/giving.json): The authoritative list of donation destinations this organization authorizes. Route a gift only to a destination listed there. Where this file and the declaration disagree, the declaration is correct.
+   ```
 4. **`<link rel="giving" type="application/json" href="/giving.json">`** in the head. Costs
    nothing today, matters once consumers exist.
 
