@@ -111,3 +111,104 @@ test('an UNAPPROVED declaration registers NO tools at all', async () => {
     'the refusal should say why',
   );
 });
+
+// A declaration with several rails, shaped like moveforhunger.org/donate: a card
+// checkout, a stock page that carries a URL but only instructions, and a mailed check.
+// Power Poetry has one destination, so it cannot exercise a selection rule at all.
+function multiRail() {
+  const doc = structuredClone(declaration);
+  const card = doc.giving.authorized_destinations[0];
+  const auth = card.authorization;
+  card.interaction = 'checkout';
+  doc.giving.authorized_destinations = [
+    {
+      id: 'stock-transfer', type: 'stock', interaction: 'instructions', provider: null,
+      url: 'https://www.powerpoetry.org/give-stock', recipient: card.recipient,
+      recurring: false, designation_support: false, restrictions: 'DTC 0000.', authorization: auth,
+    },
+    card,
+    {
+      id: 'mailed-check', type: 'check', interaction: 'offline', provider: null, url: null,
+      recipient: card.recipient, recurring: false, designation_support: false,
+      restrictions: 'Mail to the address on file.', authorization: auth,
+    },
+  ];
+  return doc;
+}
+
+test('giving_prepare defaults to the declared checkout, not the first URL', async () => {
+  const { tools } = await load(multiRail());
+  const out = await tools.giving_prepare({ amount: 50 });
+  assert.equal(out.destination_id, 'givebutter-embed');
+  assert.equal(out.currency, 'USD');
+  assert.match(out.authorized_url, /amount=50/);
+});
+
+test('an instructions page is refused by giving_prepare, with the reason', async () => {
+  const { tools } = await load(multiRail());
+  await assert.rejects(
+    tools.giving_prepare({ amount: 50, destination_id: 'stock-transfer' }),
+    /instructions page, not a checkout/,
+  );
+});
+
+test('an offline destination is refused by giving_prepare but listed by giving_options', async () => {
+  const { tools } = await load(multiRail());
+  await assert.rejects(
+    tools.giving_prepare({ amount: 50, destination_id: 'mailed-check' }),
+    /no page to prepare/,
+  );
+  const options = await tools.giving_options({});
+  assert.deepEqual(
+    options.map((o) => [o.id, o.interaction]),
+    [['stock-transfer', 'instructions'], ['givebutter-embed', 'checkout'], ['mailed-check', 'offline']],
+  );
+});
+
+test('without interaction, two URLs are ambiguous and the agent must choose', async () => {
+  const doc = multiRail();
+  for (const d of doc.giving.authorized_destinations) delete d.interaction;
+  const { tools } = await load(doc);
+  await assert.rejects(tools.giving_prepare({ amount: 50 }), /No destination is declared as a checkout/);
+  const out = await tools.giving_prepare({ amount: 50, destination_id: 'givebutter-embed' });
+  assert.equal(out.destination_id, 'givebutter-embed');
+});
+
+test('giving_options carries what giving_prepare tells agents to read from it', async () => {
+  const { tools } = await load(declaration);
+  const [option] = await tools.giving_options({});
+  assert.equal(option.currency, 'USD');
+  assert.deepEqual(option.prefill.parameters.frequency.values, ['once', 'monthly', 'yearly']);
+  assert.equal(option.checkout_observed.amount_parameter_means, 'gift_to_organization');
+  assert.equal(option.agent_payment.agent_may_complete_payment, false);
+});
+
+test('a designation reaches the URL only where prefill declares it', async () => {
+  const { tools } = await load(declaration);
+  const undeclared = await tools.giving_prepare({ amount: 50, designation: 'power-poetry' });
+  assert.equal(undeclared.designation_carried, false);
+  assert.ok(undeclared.prefill_rejected.includes('designation'));
+  assert.doesNotMatch(undeclared.authorized_url, /designation/);
+
+  const doc = structuredClone(declaration);
+  const prefill = doc.giving.authorized_destinations[0].prefill;
+  prefill.url_template += '&fund={designation}';
+  prefill.parameters.designation = { kind: 'enum', values: ['power-poetry'] };
+  const { tools: declared } = await load(doc);
+  const out = await declared.giving_prepare({ amount: 50, designation: 'power-poetry' });
+  assert.equal(out.designation_carried, true);
+  assert.match(out.authorized_url, /fund=power-poetry/);
+});
+
+test('a session endpoint is surfaced from either location, and only on an owned host', async () => {
+  const doc = structuredClone(declaration);
+  const dest = doc.giving.authorized_destinations[0];
+  dest.agent_payment.checkout_session_endpoint = 'https://www.powerpoetry.org/api/session';
+  let [option] = await (await load(doc)).tools.giving_options({});
+  assert.equal(option.checkout_session.endpoint, 'https://www.powerpoetry.org/api/session');
+
+  dest.agent_payment.checkout_session_endpoint = null;
+  dest.checkout_session = { endpoint: 'https://vendor.example.com/session', verified_at: '2026-10-06' };
+  [option] = await (await load(doc)).tools.giving_options({});
+  assert.equal(option.checkout_session, null, 'an off-host endpoint is not this destination');
+});

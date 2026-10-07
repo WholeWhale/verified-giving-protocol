@@ -78,9 +78,10 @@ For every route money can arrive by, ask:
 |---|---|
 | `type` | card, ACH, check, DAF, stock, workplace, crypto, other |
 | `url` | where a donor actually goes; `null` for offline methods |
+| `interaction` | does the page take a gift (`checkout`), explain how to give (`instructions`), or is there no page (`offline`) |
 | `provider` | the processor, if there is one |
 | `recipient` | **the name the approved flow actually shows the donor** |
-| `currency` | ISO 4217; required for online methods, and never inferred from country |
+| `currency` | ISO 4217; required for a `checkout`, and never inferred from country |
 | `recurring` | can a donor set up a repeating gift |
 | `designation_support` | can the donor **choose** a fund at checkout |
 | `restrictions` | plain-language limits, or `null` |

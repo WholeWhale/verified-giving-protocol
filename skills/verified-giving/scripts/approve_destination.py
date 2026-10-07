@@ -90,11 +90,13 @@ def main() -> int:
     # writing checkout_observed.donee_of_record as null asserts the organization is the
     # donee of record, which is a claim, not a blank.
     for key in (
+        "interaction",
         "currency",
         "designation_required",
         "prefill",
         "checkout_observed",
         "agent_payment",
+        "checkout_session",
         "platform_profile",
     ):
         if key in candidate:

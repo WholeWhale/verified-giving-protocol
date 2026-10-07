@@ -130,6 +130,45 @@
     return { url: template, applied: template !== destination.url, rejected };
   }
 
+  // Which destination giving_prepare uses when the agent names none: only a declared
+  // checkout. A URL does not make a page a checkout. A stock or IRA page has a URL and
+  // a broker's DTC number, and handing it over with prefill_applied would describe a
+  // page that cannot take an amount. A document that predates `interaction` and has
+  // exactly one destination with a URL is unambiguous, so it keeps working; with two
+  // or more, the agent has to choose one by id.
+  function defaultDestination() {
+    const checkout = authorized.find((item) => item.interaction === "checkout");
+    if (checkout) return checkout;
+    if (authorized.some((item) => item.interaction !== undefined)) return null;
+    const withUrl = authorized.filter((item) => item.url);
+    return withUrl.length === 1 ? withUrl[0] : null;
+  }
+
+  // Section 4.8. A session endpoint is reported only where it sits on a host the
+  // organization already controls, the same guard prefill applies to url_template.
+  // The deprecated location inside agent_payment is still read: an endpoint behind a
+  // field that says no is the one a consumer most needs surfaced.
+  function checkoutSession(destination) {
+    const session =
+      destination.checkout_session ??
+      (destination.agent_payment?.checkout_session_endpoint
+        ? {
+            endpoint: destination.agent_payment.checkout_session_endpoint,
+            verified_at: destination.agent_payment.verified_at ?? null,
+          }
+        : null);
+    if (!session?.endpoint) return null;
+    try {
+      const host = new URL(session.endpoint).hostname.toLowerCase();
+      const apex = String(vgp.canonical_domain).toLowerCase();
+      const own = destination.url ? new URL(destination.url).hostname.toLowerCase() : null;
+      if (host === own || host === apex || host.endsWith(`.${apex}`)) return session;
+    } catch {
+      // A malformed endpoint is not reported.
+    }
+    return null;
+  }
+
   await document.modelContext.registerTool({
     name: "giving_verify",
     description:
@@ -150,19 +189,27 @@
   await document.modelContext.registerTool({
     name: "giving_options",
     description:
-      "Return only the donation destinations this nonprofit explicitly lists as authorized in its VGP declaration.",
+      "Return only the donation destinations this nonprofit explicitly lists as authorized in its VGP declaration, including instructions pages and offline methods. interaction says whether a destination takes a gift (checkout), explains how to give (instructions), or has no page (offline). prefill lists the only fields an agent may fill; checkout_observed lists what the checkout adds to the donor's charge; agent_payment says whether an agent may complete a payment (absent means no).",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
     annotations: { readOnlyHint: true },
     execute: async () =>
       authorized.map((item) => ({
         id: item.id,
         method: item.type,
+        interaction: item.interaction ?? null,
         provider: item.provider,
         authorized_url: item.url,
         recipient: item.recipient,
+        currency: item.currency ?? null,
         recurring: item.recurring,
         restrictions: item.restrictions,
         designation_support: item.designation_support,
+        designation_required: item.designation_required ?? false,
+        prefill: item.prefill ?? null,
+        checkout_observed: item.checkout_observed ?? null,
+        agent_payment: item.agent_payment ?? null,
+        checkout_session: checkoutSession(item),
+        platform_profile: item.platform_profile ?? null,
       })),
   });
 
@@ -192,11 +239,13 @@
         },
         designation: {
           type: "string",
-          description: "Optional approved designation ID.",
+          description:
+            "Optional approved designation ID. Carried into the URL only where the destination's prefill declares a designation parameter that accepts it; otherwise it is listed in prefill_rejected and the donor selects it at checkout.",
         },
         destination_id: {
           type: "string",
-          description: "Optional authorized destination ID; defaults to the first online destination.",
+          description:
+            "Optional authorized destination ID; defaults to the destination declared as a checkout. Required where the declaration does not make that unambiguous.",
         },
         frequency: {
           type: "string",
@@ -215,21 +264,41 @@
 
       const destination = destination_id
         ? authorized.find((item) => item.id === destination_id)
-        : authorized.find((item) => item.url);
-      if (!destination?.url) {
-        throw new Error("No matching authorized online destination is available.");
+        : defaultDestination();
+      if (!destination) {
+        throw new Error(
+          destination_id
+            ? "Destination is not listed as authorized in the approved VGP declaration."
+            : "No destination is declared as a checkout. Choose one by destination_id from giving_options.",
+        );
+      }
+      // Both are authorized and both are real ways to give; neither takes an amount.
+      // Refusing here, with the reason, lets the agent describe them to the donor
+      // from giving_options instead of handing over a URL as though it were a checkout.
+      if (destination.interaction === "offline" || !destination.url) {
+        throw new Error(
+          `Destination ${destination.id} has no page to prepare. Describe it to the donor from giving_options.`,
+        );
+      }
+      if (destination.interaction === "instructions") {
+        throw new Error(
+          `Destination ${destination.id} is an instructions page, not a checkout, and cannot carry an amount. Give the donor its authorized_url from giving_options.`,
+        );
       }
 
-      const prepared = buildPrefillUrl(destination, { amount, frequency });
+      const prepared = buildPrefillUrl(destination, { amount, frequency, designation });
 
       return {
         destination_id: destination.id,
         recipient: destination.recipient,
         authorized_url: prepared.url,
+        currency: destination.currency ?? null,
         prefill_rejected: prepared.rejected,
         requested_amount: amount,
         requested_designation: designation ?? null,
         requested_frequency: frequency ?? null,
+        designation_carried: Boolean(designation) && prepared.applied && !prepared.rejected.includes("designation"),
+        designations_honored: destination.checkout_observed?.designations_honored ?? null,
         prefill_applied: prepared.applied,
         payment_completed: false,
         requires_human_payment_authorization: true,

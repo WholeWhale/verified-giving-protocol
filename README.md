@@ -123,9 +123,9 @@ Concretely, that changes three things:
 | Tool | Returns | Mode |
 |---|---|---|
 | `giving_verify` | Legal name, display name, EIN, canonical domain, VGP version, approval status, last updated | read-only |
-| `giving_options` | Only destinations the organization authorized: method, provider, authorized URL, recipient, restrictions, designation support | read-only |
+| `giving_options` | Only destinations the organization authorized, including instructions pages and offline methods: method, interaction, provider, authorized URL, recipient, currency, restrictions, designation support, and the declared prefill, checkout disclosures and payment capability | read-only |
 | `giving_designations` | Funds or programs a gift may be designated to | read-only |
-| `giving_prepare` | A prepared, authorized donation URL for a validated amount and designation | **non-transactional** |
+| `giving_prepare` | A prepared, authorized donation URL for a validated amount, on a destination declared as a checkout; a designation is carried only where prefill declares it | **non-transactional** |
 
 `giving_prepare` deliberately does not charge anything. It returns `payment_completed: false` and `requires_human_payment_authorization: true`, validates the amount range, and refuses any designation not present in the approved declaration. The donor authorizes the payment. Always.
 

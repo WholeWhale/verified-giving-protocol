@@ -264,6 +264,14 @@
           ],
           "format": "uri"
         },
+        "interaction": {
+          "enum": [
+            "checkout",
+            "instructions",
+            "offline"
+          ],
+          "description": "What the donor can do at url. checkout: the page takes a gift. instructions: the page explains how to give (a broker's DTC number, a mailing address) and takes nothing. offline: there is no page, and url is null. Optional; absent, the consumer has not been told, and MUST NOT assume a page with a URL is a checkout. See section 4.2."
+        },
         "recipient": {
           "type": "string",
           "minLength": 1
@@ -274,7 +282,7 @@
             "null"
           ],
           "pattern": "^[A-Z]{3}$",
-          "description": "ISO 4217 code the destination charges in. Required for online methods: an amount without a currency is not an amount, and a consumer MUST NOT infer one from the organization's country."
+          "description": "ISO 4217 code the destination charges in. Required where interaction is checkout: an amount without a currency is not an amount, and a consumer MUST NOT infer one from the organization's country."
         },
         "recurring": {
           "type": "boolean"
@@ -521,7 +529,7 @@
                 "string",
                 "null"
               ],
-              "description": "An endpoint that takes an amount, currency, frequency and designation and returns an approval URL or client token. Not a charge, and it never receives a card number. Null where the destination offers none."
+              "description": "Deprecated: declare checkout_session.endpoint instead. Kept readable so documents published before checkout_session existed stay valid. Inside this object it sits behind agent_may_complete_payment, and a consumer reading false has no reason to read further, so an endpoint declared only here is one most consumers will never see."
             },
             "idempotency": {
               "enum": [
@@ -550,6 +558,29 @@
             "verified_at": {
               "type": "string",
               "description": "Date these capabilities were last checked."
+            }
+          }
+        },
+        "checkout_session": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Optional. An endpoint that creates a hosted checkout for this destination and returns a URL the donor completes. Creating one charges nobody, so it is declared here rather than inside agent_payment, whose gate is about completing a payment. The request and response contract is not specified in this version. See section 4.8.",
+          "additionalProperties": false,
+          "required": [
+            "endpoint",
+            "verified_at"
+          ],
+          "properties": {
+            "endpoint": {
+              "type": "string",
+              "pattern": "^https://",
+              "description": "Absolute HTTPS URL on the host of this destination's url, or on canonical_domain or a subdomain of it. An endpoint the organization's vendor could expose but the organization does not is not declared here."
+            },
+            "verified_at": {
+              "type": "string",
+              "description": "Date the endpoint was last confirmed to respond for this organization."
             }
           }
         },
@@ -592,7 +623,72 @@
             }
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "interaction": {
+                "const": "offline"
+              }
+            },
+            "required": [
+              "interaction"
+            ]
+          },
+          "then": {
+            "properties": {
+              "url": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "interaction": {
+                "enum": [
+                  "checkout",
+                  "instructions"
+                ]
+              }
+            },
+            "required": [
+              "interaction"
+            ]
+          },
+          "then": {
+            "properties": {
+              "url": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "interaction": {
+                "const": "checkout"
+              }
+            },
+            "required": [
+              "interaction"
+            ]
+          },
+          "then": {
+            "required": [
+              "currency"
+            ],
+            "properties": {
+              "currency": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
     },
     "designation": {
       "type": "object",

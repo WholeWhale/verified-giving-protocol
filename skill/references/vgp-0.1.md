@@ -53,6 +53,8 @@ Candidate discoveries belong in `vgp-review.json`, never in the canonical VGP do
 - `type`: Giving method.
 - `provider`: Processor/provider name, or `null` when not applicable.
 - `url`: HTTPS destination for online methods; `null` for offline methods.
+- `interaction`: `checkout` (the page takes a gift), `instructions` (it explains how to give), or `offline` (no page). Optional, but an agent only prepares an amount for a `checkout`.
+- `currency`: ISO 4217 code; required where `interaction` is `checkout`.
 - `recipient`: Legal or named recipient shown by the approved flow.
 - `recurring`: Whether recurring giving is supported.
 - `designation_support`: Whether a designation can be selected.

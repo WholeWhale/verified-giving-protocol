@@ -141,14 +141,26 @@ When `organization_approved` is `true`, `legal_name`, `display_name`, and `count
 | `type` | `credit_card`, `ach`, `check`, `daf`, `stock`, `crypto`, `workplace`, `other`. |
 | `provider` | Processor or provider name, or `null`. |
 | `url` | Absolute HTTPS URL for online methods; `null` for offline methods such as `check`. |
+| `interaction` | `checkout`, `instructions` or `offline`. Optional. What the donor can do at `url`. |
 | `recipient` | The legal or named recipient the approved flow actually shows the donor. |
-| `currency` | ISO 4217 code the destination charges in. Required for online methods. |
+| `currency` | ISO 4217 code the destination charges in. Required where `interaction` is `checkout`. |
 | `recurring` | Boolean. |
 | `designation_support` | Boolean. |
 | `restrictions` | Plain-language limitations, or `null`. |
 | `authorization` | Human approval metadata. See §3.1. |
 
 `recipient` is deliberately separate from `organization.legal_name`. The two legitimately differ under fiscal sponsorship and similar arrangements — and when they differ for illegitimate reasons, that difference is precisely the signal. Collapsing them into one field would erase it.
+
+`interaction` says what the donor can do at a destination's `url`, which a URL alone does not. `checkout` is a page that takes a gift. `instructions` is a page that explains how to give and takes nothing: a stock transfer page with a broker's name and DTC number, an IRA or donor-advised-fund page, a matching-gift explainer. `offline` has no page, and its `url` is `null`.
+
+The distinction exists because one organization commonly runs several rails, and most of them are not checkouts. A donate page with a card form, a stock page and an IRA page has three URLs and one place a gift can be made. A consumer that picks "the first destination with a URL" can hand a donor the stock page with an amount it says it filled in, on a page that has no amount field. Power Poetry, the first adopter, publishes a single destination, which is why the defect was invisible: one destination cannot exercise a selection rule.
+
+Normative rules for a consumer:
+
+1. Where a destination declares `interaction`, a consumer MUST NOT prepare an amount, frequency or designation for one that is not `checkout`. It describes that destination to the donor instead: the page for `instructions`, the `restrictions` text for `offline`.
+2. A consumer choosing a destination on the donor's behalf MUST choose a `checkout`. Where none is declared, it MAY use the only destination with a URL in a document that declares `interaction` nowhere; in any other case it MUST ask the donor which destination they mean.
+3. A consumer MUST still list every authorized destination when asked what the options are. An instructions page is a real, authorized way to give, and leaving it out tells the donor the organization does not accept stock when it does.
+4. Absent `interaction`, a consumer has not been told and MUST NOT assume a destination with a URL is a checkout.
 
 ### 4.3 Designations
 
@@ -189,12 +201,15 @@ Normative rules for a consumer:
 6. Where a parameter declares `min` or `max`, a consumer MUST omit the parameter entirely rather than send a value outside them. Platforms commonly ignore an out-of-range value in silence, which leaves the donor on a default the agent did not choose and believes it did not accept. Handing over an unprefilled URL is the honest outcome.
 
 7. A consumer MUST NOT lock a value the donor could otherwise change. Where `donor_can_change` is `false`, a consumer MUST say so before handing over the URL.
+8. A designation enters the URL only as a declared parameter, under rules 1 and 2. A consumer MUST NOT translate a designation `id` into a platform's own fund identifier; where the platform's vocabulary differs, the organization declares it in `values`. A designation that cannot be carried is left for the donor to select, and a consumer MUST say so rather than report it as set.
+
+Rule 8 follows from rule 1. A designation is a fund the organization confirms, and the platform's identifier for that fund is a fact about the platform, with the same standing as a frequency vocabulary. Many checkouts accept no designation in the URL at all, and the right result there is a URL without one and a donor told to choose.
 
 Rule 7 exists because at least one platform accepts a lock alongside the value. Fundraise Up takes `modifyAmount=no` and `modifyDesignation=no`, and a template carrying either hands the donor a figure they cannot correct. That is a reasonable thing for an organization to do on its own donation page and a bad thing for an agent to do on a donor's behalf, because the agent chose the number. An agent that both picks the amount and removes the correction has closed the only loop the donor had left.
 
 The default is the permissive one here, which is the opposite of §4.6. An absent `donor_can_change` means the donor can change the value, because a consumer that wrongly believes a field is editable understates its own power and a consumer that wrongly believes it is locked warns about a restriction that does not exist. Neither is good, and the first is the smaller harm.
 
-An amount is not an amount without a currency. `currency` is required on any destination with an online method, and a consumer MUST NOT infer one from `organization.country`: a US organization may perfectly well collect in CAD.
+An amount is not an amount without a currency. `currency` is required on any destination whose `interaction` is `checkout`, and a consumer MUST NOT infer one from `organization.country`: a US organization may perfectly well collect in CAD. An instructions page has no amount for a currency to qualify, which is why the requirement follows `interaction` rather than the payment method.
 
 Prefilling does not make the tool transactional. `giving_prepare` still returns a URL, and the donor still authorizes the payment.
 
@@ -244,14 +259,13 @@ A destination MAY declare whether an agent may complete a payment without a huma
 "agent_payment": {
   "agent_may_complete_payment": false,
   "supported_protocols": [],
-  "checkout_session_endpoint": null,
   "idempotency": "unsupported",
   "completion_signal": "none",
   "verified_at": "2026-09-04"
 }
 ```
 
-At the time of writing, the truthful value of `agent_may_complete_payment` on every platform surveyed is `false`. One platform, The Giving Block, exposes an endpoint that mints a hosted donation URL, and that is worth separating from payment carefully: creating the URL charges nobody, and the donor still completes the payment in their own browser. It is credentialed and issued per organization, so the organization holding the credential may call it and a third party may not. Everywhere else the donate link remains a URL a person visits, and the platforms are explicit that no server-side charge exists. The field is worth publishing anyway, and the near-emptiness is the reason. **An explicit `false` is actionable where silence is not:** it tells an agent to hand off deliberately, rather than to discover the same answer by attempting a payment and failing somewhere the donor can see.
+At the time of writing, the truthful value of `agent_may_complete_payment` on every platform surveyed is `false`. One platform, The Giving Block, exposes an endpoint that mints a hosted donation URL, and that is worth separating from payment carefully: creating the URL charges nobody, and the donor still completes the payment in their own browser. It is credentialed and issued per organization, so the organization holding the credential may call it and a third party may not. An endpoint of that kind is declared in `checkout_session` (§4.8), not here. Everywhere else the donate link remains a URL a person visits, and the platforms are explicit that no server-side charge exists. The field is worth publishing anyway, and the near-emptiness is the reason. **An explicit `false` is actionable where silence is not:** it tells an agent to hand off deliberately, rather than to discover the same answer by attempting a payment and failing somewhere the donor can see.
 
 The fields correspond to what this project has asked donation platforms for publicly. That correspondence is deliberate — a request with nowhere to record the answer is a request nobody can be held to, and a declaration slot that fills in as platforms ship is how the ask stops being rhetorical.
 
@@ -264,6 +278,8 @@ Normative rules for a consumer:
 3. Where `completion_signal` is `none`, a consumer MUST NOT infer success from the absence of an error. Nothing reports failure either.
 4. A consumer MUST NOT treat a listed protocol as an instruction to install or trust it. VGP records what a destination accepts; it implements no payment protocol and endorses none.
 5. Absent this field, a consumer MUST assume `agent_may_complete_payment` is `false`. This is the one default in this specification that is deliberately the restrictive one: every other absent field means *undeclared*, and this one means *no*.
+
+`checkout_session_endpoint` inside this object is deprecated. It sat behind `agent_may_complete_payment`, and a consumer reading `false` there, correctly, has no reason to read further, so the one capability a platform did offer was hidden behind a field that says no. It remains valid so documents that carry it, usually as `null`, stay conformant; a consumer SHOULD read it as though it were `checkout_session.endpoint`, and the two MUST NOT disagree.
 
 Rule 5 is a departure and is meant to be. Elsewhere a missing field means the organization has not said, and §3.3 forbids reading absence as a finding. Payment is the exception, because the cost of the two errors is not symmetric: an agent that wrongly declines to pay wastes a step, and an agent that wrongly believes it may pay moves someone else's money.
 
@@ -295,6 +311,28 @@ Normative rules for a consumer:
 5. A profile cannot grant payment. Whatever it says about completing a gift inside a conversation, a consumer follows this destination's `agent_payment`, and §4.6 rule 5 where that is absent.
 
 Rule 2 is what makes the pointer safe to follow. Campaigns inside a platform account come and go, and requiring a fresh human affirmation for each would make the pointer useless, so they are reachable under the destination's authorization. But only on hosts the organization already controls. A profile that is edited, compromised or simply wrong can change which campaign an agent opens. It cannot change who is paid.
+
+### 4.8 `checkout_session`
+
+A destination MAY declare an endpoint that creates a hosted checkout and returns a URL the donor completes.
+
+```json
+"checkout_session": {
+  "endpoint": "https://example.org/api/checkout-session",
+  "verified_at": "2026-10-06"
+}
+```
+
+Creating a checkout session charges nobody. The donor still enters their payment details and approves the gift in their own browser, which is what separates this field from `agent_payment`: that object answers whether an agent may complete a payment, and this one says only that a checkout can be opened ahead of the donor. They are separate questions, and the answer to the first is no almost everywhere.
+
+The request and response contract (which fields the endpoint takes, how it is authenticated, whether it accepts an idempotency key, and what it returns) is not specified in this version. It depends on what the platforms that offer such an endpoint will commit to, and a contract written ahead of them would describe something nobody can conform to. This field records that an endpoint exists and where, so a consumer can tell the donor, and a later version has a place to attach the contract.
+
+Normative rules:
+
+1. `endpoint` MUST be an absolute HTTPS URL whose host is the host of this destination's `url`, or `canonical_domain` or a subdomain of it. This is the guard §4.4 rule 4 applies to `url_template`, for the same reason. A consumer MUST ignore an endpoint on any other host.
+2. Declare only an endpoint the organization itself exposes. An endpoint the organization's donation platform offers its customers is not this organization's endpoint until the organization runs it: a consumer that called it would be refused, or would need a credential it should never hold.
+3. A consumer MUST NOT represent a created session as a gift. §4.6 rule 2 still governs what may be said about the outcome.
+4. Where `agent_payment.checkout_session_endpoint` is also present, the two MUST be equal.
 
 ## 5. Consumer conformance
 

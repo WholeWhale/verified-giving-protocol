@@ -278,6 +278,105 @@ def test_trust_invariants() -> None:
 
 
 # --------------------------------------------------------------------------
+# 3b. What a destination is for: interaction and checkout_session
+# --------------------------------------------------------------------------
+def test_destination_interaction() -> None:
+    print("\ninteraction and checkout_session")
+    approved = load(ROOT / "vgp" / "examples" / "approved.giving.json")
+
+    def with_card(**fields) -> dict:
+        doc = copy.deepcopy(approved)
+        doc["giving"]["authorized_destinations"][0].update(fields)
+        return doc
+
+    with tempfile.TemporaryDirectory() as raw:
+        tmp = Path(raw)
+
+        check(
+            "a declared checkout with a currency validates",
+            validates_ok(with_card(interaction="checkout", currency="USD"), tmp, "checkout"),
+        )
+        check(
+            "a checkout without a currency is rejected",
+            not validates_ok(with_card(interaction="checkout", currency=None), tmp, "checkout_no_currency"),
+            "an amount without a currency is not an amount",
+        )
+        check(
+            "an instructions page needs no currency",
+            validates_ok(with_card(interaction="instructions"), tmp, "instructions"),
+        )
+        check(
+            "an instructions page without a URL is rejected",
+            not validates_ok(with_card(interaction="instructions", url=None), tmp, "instructions_no_url"),
+        )
+        check(
+            "an offline destination carrying a URL is rejected",
+            not validates_ok(with_card(interaction="offline"), tmp, "offline_url"),
+        )
+        check(
+            "an offline destination of any type may omit its URL",
+            validates_ok(with_card(interaction="offline", url=None), tmp, "offline"),
+        )
+        check(
+            "an unknown interaction is rejected",
+            not validates_ok(with_card(interaction="widget"), tmp, "unknown_interaction"),
+        )
+
+        session = {"endpoint": "https://example.org/api/session", "verified_at": "2026-10-06"}
+        check(
+            "a checkout_session on the organization's host validates",
+            validates_ok(with_card(checkout_session=session), tmp, "session"),
+        )
+        check(
+            "a checkout_session on another host is rejected",
+            not validates_ok(
+                with_card(checkout_session={**session, "endpoint": "https://vendor.example.com/session"}),
+                tmp,
+                "session_off_host",
+            ),
+            "an endpoint off the organization's hosts is not describing this destination",
+        )
+        check(
+            "a plain-HTTP checkout_session is rejected",
+            not validates_ok(
+                with_card(checkout_session={**session, "endpoint": "http://example.org/session"}),
+                tmp,
+                "session_http",
+            ),
+        )
+
+        payment = {
+            "agent_may_complete_payment": False,
+            "supported_protocols": [],
+            "checkout_session_endpoint": "https://example.org/api/session",
+            "verified_at": "2026-10-06",
+        }
+        legacy = tmp / "legacy.json"
+        legacy.write_text(json.dumps(with_card(agent_payment=payment)), encoding="utf-8")
+        result = validate(legacy)
+        check(
+            "the deprecated agent_payment.checkout_session_endpoint still validates",
+            result.returncode == 0,
+            result.stdout + result.stderr,
+        )
+        check(
+            "the deprecated location is reported",
+            "deprecated" in (result.stdout + result.stderr),
+        )
+        check(
+            "the two locations may not disagree",
+            not validates_ok(
+                with_card(
+                    agent_payment=payment,
+                    checkout_session={**session, "endpoint": "https://example.org/other"},
+                ),
+                tmp,
+                "session_conflict",
+            ),
+        )
+
+
+# --------------------------------------------------------------------------
 # 4. The approval gate
 # --------------------------------------------------------------------------
 def test_approval_gate() -> None:
@@ -388,6 +487,11 @@ def test_approval_gate() -> None:
         doc_review = load(review_template)
         candidate = doc_review["candidates"][0]
         candidate["currency"] = "USD"
+        candidate["interaction"] = "checkout"
+        candidate["checkout_session"] = {
+            "endpoint": "https://example.org/api/checkout-session",
+            "verified_at": "2026-10-06",
+        }
         candidate["checkout_observed"] = {
             "amount_parameter_means": "no_amount_parameter",
             "organization_receives": "unknown",
@@ -429,6 +533,16 @@ def test_approval_gate() -> None:
                 promoted.get("checkout_observed", {}).get("amount_parameter_means")
                 == "no_amount_parameter",
                 "a fee disclosure dropped at approval is a disclosure nobody made",
+            )
+            check(
+                "interaction survives promotion",
+                promoted.get("interaction") == "checkout",
+                "a dropped interaction makes a checkout indistinguishable from an instructions page",
+            )
+            check(
+                "checkout_session survives promotion",
+                promoted.get("checkout_session", {}).get("endpoint")
+                == "https://example.org/api/checkout-session",
             )
             check(
                 "agent_payment survives promotion",
@@ -576,6 +690,7 @@ def main() -> int:
     test_no_artifact_drift()
     test_shipped_documents_validate()
     test_trust_invariants()
+    test_destination_interaction()
     test_approval_gate()
     test_not_listed_wording()
     test_sources_parse()

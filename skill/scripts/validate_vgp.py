@@ -19,6 +19,7 @@ METHODS = {"credit_card", "ach", "check", "daf", "stock", "crypto", "workplace",
 ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 DOMAIN_RE = re.compile(r"^(?=.{1,253}$)(?!-)[A-Za-z0-9.-]+(?<!-)$")
 EIN_RE = re.compile(r"^[0-9]{2}-[0-9]{7}$")
+INTERACTIONS = {"checkout", "instructions", "offline"}
 
 
 def is_datetime(value: object) -> bool:
@@ -140,8 +141,52 @@ def validate(data: object, check_urls: bool) -> tuple[list[str], list[str]]:
         if not isinstance(item.get("recipient"), str) or not item.get("recipient", "").strip():
             errors.append(f"{prefix}.recipient is required")
         url = item.get("url")
-        if item.get("type") != "check" and not isinstance(url, str):
+        interaction = item.get("interaction")
+        if "interaction" in item and interaction not in INTERACTIONS:
+            errors.append(f"{prefix}.interaction must be checkout, instructions, or offline")
+        if interaction == "offline":
+            if url is not None:
+                errors.append(f"{prefix}.url must be null where interaction is offline")
+        elif item.get("type") != "check" and not isinstance(url, str):
             errors.append(f"{prefix}.url is required for online methods")
+        if interaction in {"checkout", "instructions"} and not isinstance(url, str):
+            errors.append(f"{prefix}.url is required where interaction is {interaction}")
+        # An amount without a currency is not an amount. Required only where the page
+        # takes a gift: an instructions page has no amount for a currency to qualify.
+        currency = item.get("currency")
+        if interaction == "checkout" and not isinstance(currency, str):
+            errors.append(f"{prefix}.currency is required where interaction is checkout")
+        if currency is not None and (not isinstance(currency, str) or not re.fullmatch(r"[A-Z]{3}", currency)):
+            errors.append(f"{prefix}.currency must be null or an ISO 4217 code")
+        session = item.get("checkout_session")
+        if session is not None:
+            endpoint = session.get("endpoint") if isinstance(session, dict) else None
+            if not isinstance(endpoint, str) or not endpoint.startswith("https://"):
+                errors.append(f"{prefix}.checkout_session.endpoint must be an absolute HTTPS URL")
+            elif isinstance(domain, str):
+                # The same guard prefill applies to url_template: an endpoint off the
+                # organization's own hosts is not describing this destination.
+                host = (urlparse(endpoint).hostname or "").lower()
+                allowed = {(urlparse(url).hostname or "").lower()} if isinstance(url, str) else set()
+                apex = domain.lower()
+                if host not in allowed and host != apex and not host.endswith("." + apex):
+                    errors.append(
+                        f"{prefix}.checkout_session.endpoint must be on the destination's host or canonical_domain"
+                    )
+            if not isinstance(session, dict) or not isinstance(session.get("verified_at"), str):
+                errors.append(f"{prefix}.checkout_session.verified_at is required")
+        payment = item.get("agent_payment")
+        legacy = payment.get("checkout_session_endpoint") if isinstance(payment, dict) else None
+        if legacy is not None:
+            current = session.get("endpoint") if isinstance(session, dict) else None
+            if current is not None and current != legacy:
+                errors.append(
+                    f"{prefix}.agent_payment.checkout_session_endpoint disagrees with checkout_session.endpoint"
+                )
+            else:
+                warnings.append(
+                    f"{prefix}.agent_payment.checkout_session_endpoint is deprecated; declare checkout_session.endpoint"
+                )
         if isinstance(url, str):
             parsed = urlparse(url)
             if parsed.scheme != "https" or not parsed.netloc:
