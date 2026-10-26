@@ -147,10 +147,11 @@ Real, in `C:\Users\gewei\github\verified-giving-protocol`:
 
 Absences that must not be fabricated:
 
-- **No nonprofit has published a VGP declaration yet.** There are zero adopters. No
-  adoption counts, logos, testimonials, or "trusted by" claims exist or may be implied.
-- Power Poetry's legal entity, EIN, and its relationship to To Be Heard Foundation are
-  unresolved. The reference implementation is deliberately unapproved.
+- **No adoption counts.** No adopter numbers, logos, testimonials, or "trusted by" claims
+  may be stated or implied. The site deliberately does not say how many organizations
+  publish a declaration.
+- Power Poetry, a program of To Be Heard Foundation Inc (EIN 13-3648963), is the reference
+  implementation. Its declaration is approved and served at `powerpoetry.org/giving.json`.
 - VGP has no standards-body status, no IANA well-known URI registration, and no working
   group. It is a 0.1 draft published by one agency.
 
@@ -166,7 +167,7 @@ Absences that must not be fabricated:
    critique is defaults, delay, and severed donor relationships — never legitimacy.
 4. **Ship the file, not the pitch.** The measure of the site is whether a developer leaves
    with a valid, serving declaration. Persuasion that does not end in a shipped file failed.
-5. **Claim only what is built.** With zero adopters, credibility comes from the artifact's
+5. **Claim only what is built.** Credibility comes from the artifact's
    rigor — the spec, the schema, the tests — not from implied traction.
 
 ## Accessibility & Inclusion
